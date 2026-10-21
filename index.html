@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Brain Dump</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1C1F3A">
+<script>try{var __t=localStorage.getItem("bd_theme")||"dark";document.documentElement.setAttribute("data-theme",__t);if(__t==="light")document.querySelector('meta[name="theme-color"]').setAttribute("content","#F2F1F8");}catch(e){document.documentElement.setAttribute("data-theme","dark");}</script>
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Brain Dump">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#6D5BD0;
+  --primary-text:#B3A8FF;
+  --pink:#FF8FB1;
+  --secondary:#1C1F3A;
+  --secondary-light:#262A4A;
+  --secondary-lighter:#353A62;
+  --neutral:#ECEBF5;
+  --neutral-dim:#9A98B5;
+  --line:rgba(236,235,245,0.12);
+  --danger:#F0616D;
+  --success:#3FBF7F;
+  --warn:#FFC857;
+  --page-bg:#12142A;
+}
+:root[data-theme="light"]{
+  --primary-text:#5544C0;
+  --pink:#C2416B;
+  --secondary:#F2F1F8;
+  --secondary-light:#FFFFFF;
+  --secondary-lighter:#E3E1F0;
+  --neutral:#1E1B3A;
+  --neutral-dim:#5E5A7A;
+  --line:rgba(30,27,58,0.14);
+  --danger:#C7343A;
+  --success:#1F9A5C;
+  --warn:#9A6A00;
+  --page-bg:#E8E6F2;
+}
+:root[data-theme="light"] .card,:root[data-theme="light"] .chore{box-shadow:0 1px 3px rgba(30,27,58,0.07);}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--page-bg);overscroll-behavior-y:none;}
+body{font-family:'Inter',-apple-system,sans-serif;color:var(--neutral);}
+button,label,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+#app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--secondary);display:flex;flex-direction:column;position:relative;}
+.header{position:sticky;top:0;z-index:20;background:var(--secondary);padding:calc(12px + env(safe-area-inset-top)) 16px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-title{font-weight:800;font-size:15px;letter-spacing:0.06em;text-transform:uppercase;line-height:1.15;}
+.brand-title span{display:block;font-size:11px;font-weight:500;color:var(--neutral-dim);letter-spacing:0.04em;text-transform:none;}
+.sync-pill{display:flex;align-items:center;gap:6px;background:var(--secondary-light);border:1px solid var(--line);color:var(--neutral-dim);font:600 12px Inter,sans-serif;border-radius:999px;padding:7px 11px;cursor:pointer;}
+.sync-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--success);}
+.sync-pill.pending .dot{background:var(--warn);}
+.sync-pill.offline .dot{background:var(--neutral-dim);}
+.main{flex:1;padding:16px 16px 110px;}
+.card{background:var(--secondary-light);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pink);margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;}
+h1.page-title{font-size:20px;font-weight:700;margin:2px 0 16px;}
+label.lbl{display:block;font-size:12px;color:var(--neutral-dim);margin-bottom:5px;font-weight:600;}
+input[type=text],input[type=date],input[type=time],input[type=number],input[type=password],select,textarea{
+  width:100%;background:var(--secondary);border:1px solid var(--line);border-radius:10px;color:var(--neutral);
+  padding:11px 12px;font-size:16px;font-family:inherit;margin-bottom:14px;-webkit-appearance:none;appearance:none;min-height:44px;}
+textarea{resize:vertical;min-height:64px;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;}
+.row2>div{min-width:0;}
+input[type=date],input[type=time]{min-width:0;max-width:100%;display:block;}
+.seg{display:flex;gap:6px;margin-bottom:14px;background:var(--secondary);border:1px solid var(--line);border-radius:12px;padding:4px;}
+.seg button{flex:1;min-width:0;border:none;background:transparent;color:var(--neutral-dim);font-family:inherit;font-size:13px;font-weight:600;padding:9px 4px;border-radius:9px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.seg button.active{background:var(--primary);color:#fff;}
+.hint{font-size:12px;color:var(--neutral-dim);margin:-6px 0 14px;line-height:1.45;}
+.btn{font-family:inherit;font-size:15px;font-weight:700;border-radius:11px;padding:13px 16px;border:none;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn:disabled{opacity:.5;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-secondary{background:transparent;border:1.5px solid var(--neutral-dim);color:var(--neutral);}
+.btn-danger{background:transparent;border:1.5px solid var(--danger);color:var(--danger);}
+.btn-slim{padding:11px 14px;font-size:14px;}
+.btn-row{display:flex;gap:8px;margin-bottom:10px;}
+.btn-row .btn{flex:1;width:auto;}
+.bottom-nav{position:sticky;bottom:0;background:var(--secondary-light);border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:20;}
+.bottom-nav button{flex:1;background:none;border:none;color:var(--neutral-dim);font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:6px 0;cursor:pointer;position:relative;}
+.bottom-nav button.active{color:var(--primary-text);}
+.nav-dot,.tab-dot{min-width:18px;height:18px;border-radius:9px;background:#D62828;color:#fff;font:800 11px Inter,Arial,sans-serif;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;}
+.nav-dot{position:absolute;top:2px;left:calc(50% + 6px);}
+.tab-dot{margin-left:6px;}
+.fab{position:fixed;z-index:25;right:max(16px,calc(50% - 224px));bottom:calc(76px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--primary);color:#fff;border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,0.3);cursor:pointer;}
+.tabs{display:flex;gap:6px;margin-bottom:12px;}
+.tabs button{flex:1;border:1px solid var(--line);background:var(--secondary-light);color:var(--neutral-dim);font:700 14px Inter,sans-serif;padding:11px 6px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.tabs button.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.subbar{display:flex;align-items:center;justify-content:space-between;margin:0 2px 8px;font-size:12px;color:var(--neutral-dim);}
+.linkish{background:none;border:none;color:var(--primary-text);font:600 13px Inter,sans-serif;cursor:pointer;padding:6px 0;}
+.group-h{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--neutral-dim);margin:16px 2px 8px;display:flex;justify-content:space-between;}
+.group-h.overdue{color:var(--danger);}
+.group-h:first-child{margin-top:4px;}
+.chore{display:flex;align-items:center;gap:12px;background:var(--secondary-light);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;}
+.chore.late{border-left:4px solid var(--danger);}
+.chore.paused{opacity:.6;}
+.tick{flex:none;width:32px;height:32px;border-radius:50%;border:2.5px solid var(--neutral-dim);background:transparent;color:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+.tick:active,.tick.on{background:var(--success);border-color:var(--success);color:#fff;}
+.chore-main{flex:1;min-width:0;cursor:pointer;}
+.chore-title{font-size:15px;font-weight:600;line-height:1.3;}
+.chore-sub{font-size:12px;color:var(--neutral-dim);margin-top:3px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;}
+.chore-sub .late{color:var(--danger);font-weight:700;}
+.chore-sub .meta{display:inline-flex;align-items:center;gap:3px;}
+.who{flex:none;width:28px;height:28px;border-radius:50%;color:#fff;font:800 12px Inter,sans-serif;display:flex;align-items:center;justify-content:center;}
+.who.sm{width:22px;height:22px;font-size:10px;}
+.who.either{background:transparent;border:1.5px dashed var(--neutral-dim);color:var(--neutral-dim);font-size:10px;width:auto;padding:0 7px;border-radius:999px;}
+.effort{letter-spacing:1px;color:var(--pink);}
+.att-card{border-left:4px solid #D62828;}
+.att-sum{font-size:14px;font-weight:600;margin-bottom:6px;}
+.att-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);}
+.att-row .t{flex:1;min-width:0;font-size:14px;font-weight:600;cursor:pointer;}
+.att-row .t span{display:block;font-size:12px;color:var(--neutral-dim);font-weight:500;}
+.banner{background:rgba(109,91,208,0.15);border:1px solid rgba(109,91,208,0.4);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.45;margin-bottom:12px;}
+.empty{text-align:center;padding:40px 20px;color:var(--neutral-dim);font-size:14px;line-height:1.5;}
+.done-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);}
+.done-row:first-child{border-top:none;}
+.done-row .t{flex:1;min-width:0;font-size:14px;font-weight:600;}
+.done-row .t span{display:block;font-size:12px;color:var(--neutral-dim);font-weight:500;margin-top:2px;}
+.done-row .t.skipped{color:var(--neutral-dim);text-decoration:line-through;}
+.small-btn{flex:none;background:transparent;border:1.5px solid var(--line);color:var(--neutral-dim);font:600 12px Inter,sans-serif;border-radius:9px;padding:7px 10px;cursor:pointer;}
+.hidden-note{font-size:13px;color:var(--neutral-dim);text-align:center;padding:10px;}
+.fair-row{margin-bottom:16px;}
+.fair-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.fair-top .n{flex:1;font-weight:700;font-size:16px;}
+.fair-top .v{font-size:13px;color:var(--neutral-dim);}
+.bar{height:14px;border-radius:7px;background:var(--secondary);overflow:hidden;}
+.bar div{height:100%;border-radius:7px;}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.stat{background:var(--secondary);border-radius:10px;padding:9px 10px;}
+.stat b{display:block;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;}
+.stat span{font-size:10px;color:var(--neutral-dim);text-transform:uppercase;letter-spacing:.05em;}
+.list-line{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:7px 0;border-top:1px solid var(--line);}
+.list-line:first-child{border-top:none;}
+.list-line span:last-child{color:var(--neutral-dim);text-align:right;}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;}
+.set-row:first-of-type{border-top:none;}
+.arr-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line);}
+.arr-row:first-of-type{border-top:none;}
+.arr-row .n{flex:1;font-size:15px;font-weight:600;}
+.arr-row.off .n{color:var(--neutral-dim);text-decoration:line-through;}
+.icon-btn{flex:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--secondary);color:var(--neutral);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+.icon-btn:disabled{opacity:.3;}
+.switch{flex:none;width:50px;height:30px;border-radius:15px;background:var(--secondary-lighter);border:none;position:relative;cursor:pointer;padding:0;}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .15s;}
+.switch.on{background:var(--success);}
+.switch.on::after{left:23px;}
+.top-back{display:flex;align-items:center;gap:6px;color:var(--neutral-dim);font-size:14px;font-weight:600;margin-bottom:14px;cursor:pointer;background:none;border:none;padding:6px 0;font-family:inherit;}
+.notice{background:rgba(255,200,87,0.1);border:1px solid rgba(255,200,87,0.35);color:var(--warn);font-size:12px;padding:9px 11px;border-radius:9px;margin-bottom:14px;line-height:1.45;}
+.login-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 24px calc(32px + env(safe-area-inset-bottom));text-align:center;}
+.login-wrap h1{font-size:26px;font-weight:800;margin:14px 0 4px;letter-spacing:.02em;}
+.login-wrap p{color:var(--neutral-dim);font-size:14px;margin:0 0 26px;}
+.login-wrap input{text-align:center;letter-spacing:.08em;text-transform:uppercase;}
+.err{color:var(--danger);font-size:13px;margin:-4px 0 14px;}
+/* chore detail */
+.detail-title{font-size:22px;font-weight:800;margin:0 0 6px;line-height:1.25;}
+.detail-sub{font-size:13px;color:var(--neutral-dim);display:flex;flex-wrap:wrap;gap:4px 10px;margin-bottom:12px;}
+.detail-sub .late{color:var(--danger);font-weight:700;}
+.notes{font-size:14px;line-height:1.5;white-space:pre-wrap;margin-bottom:12px;}
+.ck-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line);}
+.ck-row:first-child{border-top:none;}
+.ck-box{flex:none;width:26px;height:26px;border-radius:7px;border:2px solid var(--neutral-dim);background:transparent;color:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+.ck-box.on{background:var(--success);border-color:var(--success);color:#fff;}
+.ck-row .t{flex:1;font-size:15px;line-height:1.35;}
+.ck-row.done .t{color:var(--neutral-dim);text-decoration:line-through;}
+.ck-row .by{font-size:11px;color:var(--neutral-dim);}
+.add-row{display:flex;gap:8px;margin-top:10px;}
+.add-row input{margin:0;flex:1;}
+.add-row .btn{width:auto;flex:none;}
+.media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.media{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--secondary);border:1px solid var(--line);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--neutral-dim);}
+.media img{width:100%;height:100%;object-fit:cover;display:block;}
+.media .tag{position:absolute;left:4px;bottom:4px;background:rgba(0,0,0,.6);color:#fff;font:700 10px Inter,sans-serif;border-radius:6px;padding:2px 6px;}
+.media .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6);}
+.media-add{border:1.5px dashed var(--neutral-dim);flex-direction:column;gap:4px;font:600 12px Inter,sans-serif;text-align:center;padding:6px;}
+.media-add input{display:none;}
+.cm{padding:10px 0;border-top:1px solid var(--line);}
+.cm:first-child{border-top:none;}
+.cm .h{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--neutral-dim);margin-bottom:4px;}
+.cm .h b{color:var(--neutral);font-size:13px;}
+.cm .b{font-size:14px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word;}
+.cm .pend{font-size:11px;color:var(--warn);}
+.opt-row{display:flex;align-items:center;gap:12px;width:100%;background:transparent;border:none;border-top:1px solid var(--line);color:var(--neutral);font:600 15px Inter,sans-serif;padding:13px 2px;cursor:pointer;text-align:left;}
+.opt-row:first-child{border-top:none;}
+.opt-row.danger{color:var(--danger);}
+.ed-item{display:flex;gap:6px;align-items:center;margin-bottom:8px;}
+.ed-item input{margin:0;flex:1;}
+.paste-prev{max-height:260px;overflow:auto;}
+/* overlays live outside #app so the regular refresh never wipes them */
+.sheet-back{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.45);display:flex;align-items:flex-end;justify-content:center;}
+.sheet{width:100%;max-width:480px;background:var(--secondary-light);color:var(--neutral);border-radius:20px 20px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom));font-family:'Inter',-apple-system,sans-serif;max-height:85vh;overflow-y:auto;}
+.sheet h3{margin:0 0 4px;font-size:17px;}
+.sheet .st-sub{font-size:13px;color:var(--neutral-dim);margin-bottom:14px;line-height:1.45;}
+.sheet .btn{margin-bottom:8px;}
+.sheet-opt{display:flex;align-items:center;gap:12px;width:100%;background:var(--secondary);border:1px solid var(--line);border-radius:12px;color:var(--neutral);font:600 15px Inter,sans-serif;padding:13px 14px;margin-bottom:8px;cursor:pointer;text-align:left;}
+.sheet-opt span{display:block;font-size:12px;color:var(--neutral-dim);font-weight:500;margin-top:2px;}
+.viewer{position:fixed;inset:0;z-index:1200;background:#000;display:flex;flex-direction:column;font-family:'Inter',-apple-system,sans-serif;}
+.viewer .vbar{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;color:#fff;}
+.viewer .vbar.bot{padding:10px 12px calc(12px + env(safe-area-inset-bottom));}
+.viewer .vbtn{background:rgba(255,255,255,.12);border:none;color:#fff;font:700 14px Inter,sans-serif;border-radius:10px;padding:10px 14px;cursor:pointer;}
+.viewer .vbtn.danger{color:#FF8A93;}
+.viewer .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:14px;}
+.viewer .stage img,.viewer .stage video{max-width:100%;max-height:100%;}
+.toast{position:fixed;z-index:1100;left:50%;transform:translateX(-50%);bottom:calc(150px + env(safe-area-inset-bottom));background:#2B2E50;color:#fff;border-radius:12px;padding:10px 10px 10px 14px;display:flex;align-items:center;justify-content:space-between;gap:14px;font:600 14px Inter,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35);width:calc(100% - 32px);max-width:448px;}
+.toast button{background:none;border:none;color:#B3A8FF;font:800 14px Inter,sans-serif;padding:6px 8px;cursor:pointer;}
+pre.share-text{white-space:pre-wrap;font:13px/1.45 Inter,sans-serif;background:var(--secondary);border-radius:10px;padding:12px;margin:0 0 12px;max-height:40vh;overflow:auto;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="overlay"></div>
+<div id="viewerHost"></div>
+<div id="toastHost"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* =====================================================================
+   SETTINGS FOR THIS COPY OF THE APP
+   Paste your Supabase project URL and public (anon / publishable) key here.
+   The key is designed to be public: the database functions check each
+   person's access code, so the key on its own shows nothing.
+   ===================================================================== */
+var SUPABASE_URL = 'PASTE-YOUR-PROJECT-URL-HERE';
+var SUPABASE_ANON_KEY = 'PASTE-YOUR-ANON-KEY-HERE';
+var APP_VERSION = 'v2 - 21 Oct 2026';
+
+var CONFIGURED = /^https:\/\//.test(SUPABASE_URL) && SUPABASE_ANON_KEY.indexOf('PASTE') !== 0;
+var FUNCTION_URL = SUPABASE_URL.replace(/\/$/, '') + '/functions/v1/brain-dump';
+var DEFAULT_ROOMS = ['Kitchen','Bathroom','Bedroom','Lounge','Laundry','Garden','Outside','Admin','Other'];
+var SYNC_EVERY_MS = 20000;
+var MAX_VIDEO_MB = 200;      /* the photo store accepts files up to 200 MB */
+var PHOTO_MAX_PX = 1600;     /* photos are shrunk to this size before upload */
+
+/* ---------- Supabase client ---------- */
+/* 12 second time-out for weak signal, but 10 minutes for photo and video uploads */
+function timeoutFetch(input, init){
+  var url = typeof input === 'string' ? input : (input && input.url) || '';
+  var ms = /\/storage\/v1\/object\/upload\//.test(url) ? 600000 : 12000;
+  var ctl = new AbortController();
+  var t = setTimeout(function(){ ctl.abort(); }, ms);
+  init = init || {};
+  init.signal = ctl.signal;
+  return fetch(input, init).finally(function(){ clearTimeout(t); });
+}
+var sb = null, LIB_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js', _libLoading = null;
+/* If the app was opened with no signal and the library could not load, fetch it again once there is signal */
+function ensureLib(){
+  if(window.supabase || !CONFIGURED) return Promise.resolve();
+  if(_libLoading) return _libLoading;
+  _libLoading = new Promise(function(res){
+    var s = document.createElement('script');
+    s.src = LIB_URL;
+    s.onload = function(){ _libLoading = null; res(); };
+    s.onerror = function(){ s.remove(); _libLoading = null; res(); };
+    document.head.appendChild(s);
+  });
+  return _libLoading;
+}
+function getClient(){
+  if(sb) return sb;
+  if(!CONFIGURED || !window.supabase) return null;
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth:{persistSession:false, autoRefreshToken:false},
+    global:{fetch: timeoutFetch}
+  });
+  return sb;
+}
+/* Calls the Brain Dump edge function (photos, notifications) */
+async function callFn(body){
+  var headers = {'content-type':'application/json', apikey:SUPABASE_ANON_KEY};
+  if(SUPABASE_ANON_KEY.indexOf('eyJ') === 0) headers.Authorization = 'Bearer '+SUPABASE_ANON_KEY;
+  body.code = state.me && state.me.code;
+  var r;
+  try{ r = await timeoutFetch(FUNCTION_URL, {method:'POST', headers:headers, body:JSON.stringify(body)}); }
+  catch(e){ var ne = new Error('network'); ne.network = true; throw ne; }
+  var data = null; try{ data = await r.json(); }catch(e){}
+  if(!r.ok){
+    var err = new Error((data && (data.error || data.message)) || ('Function error '+r.status));
+    err.status = r.status; err.code = data && data.code;
+    if(r.status === 404) err.noFunction = true;
+    throw err;
+  }
+  return data;
+}
+
+/* ---------- on-phone storage (IndexedDB) ---------- */
+var DB_NAME='braindump', DB_VERSION=2, _dbp=null;
+function db(){
+  if(_dbp) return _dbp;
+  _dbp = new Promise(function(res, rej){
+    var r = indexedDB.open(DB_NAME, DB_VERSION);
+    r.onupgradeneeded = function(){
+      var d = r.result;
+      if(!d.objectStoreNames.contains('kv')) d.createObjectStore('kv', {keyPath:'k'});
+      if(!d.objectStoreNames.contains('queue')) d.createObjectStore('queue', {keyPath:'seq', autoIncrement:true});
+      if(!d.objectStoreNames.contains('media')) d.createObjectStore('media', {keyPath:'id'});   /* photos and videos waiting to upload */
+    };
+    r.onsuccess = function(){ res(r.result); };
+    r.onerror = function(){ rej(r.error); };
+  });
+  return _dbp;
+}
+function tx(store, mode, fn){
+  return db().then(function(d){
+    return new Promise(function(res, rej){
+      var t = d.transaction(store, mode), s = t.objectStore(store), out;
+      var r = fn(s);
+      if(r) r.onsuccess = function(){ out = r.result; };
+      t.oncomplete = function(){ res(out); };
+      t.onerror = function(){ rej(t.error); };
+    });
+  });
+}
+function kvGet(k){ return tx('kv','readonly',function(s){ return s.get(k); }).then(function(r){ return r ? r.v : null; }); }
+function kvSet(k, v){ return tx('kv','readwrite',function(s){ return s.put({k:k, v:v}); }); }
+function kvDel(k){ return tx('kv','readwrite',function(s){ return s.delete(k); }); }
+function qAll(){ return tx('queue','readonly',function(s){ return s.getAll(); }).then(function(r){ return r||[]; }); }
+function qAdd(op){ return tx('queue','readwrite',function(s){ return s.add(op); }); }
+function qPut(op){ return tx('queue','readwrite',function(s){ return s.put(op); }); }
+function qDel(seq){ return tx('queue','readwrite',function(s){ return s.delete(seq); }); }
+function qClear(){ return tx('queue','readwrite',function(s){ return s.clear(); }); }
+function mediaPut(m){ return tx('media','readwrite',function(s){ return s.put(m); }); }
+function mediaGet(id){ return tx('media','readonly',function(s){ return s.get(id); }); }
+function mediaDel(id){ return tx('media','readwrite',function(s){ return s.delete(id); }); }
+function mediaClear(){ return tx('media','readwrite',function(s){ return s.clear(); }); }
+
+/* ---------- app state ---------- */
+var state = {
+  screen:'loading', tab:'mine', fairRange:'week',
+  me:null, people:[], chores:[], completions:[], comments:[], attachments:[], thumbs:{}, version:null,
+  queue:[], online:navigator.onLine, syncing:false, lastSync:null, failedOps:0, uploading:null,
+  settings:{theme:'dark', roomOrder:[], hiddenRooms:[], showFairness:true, showAttention:true, groupBy:'date'},
+  edit:null, detailId:null, paste:null, commentDraft:'', itemDraft:'', showHidden:false,
+  loginError:'', loginBusy:false, pendingRender:false,
+  fnOk:null, vapidKey:null, push:{supported:false, subscribed:false, busy:false, msg:''}, urlCache:{}
+};
+
+/* ---------- small helpers ---------- */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function uuid(){
+  if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  var b = new Uint8Array(16); crypto.getRandomValues(b); b[6]=(b[6]&15)|64; b[8]=(b[8]&63)|128;
+  var h = Array.prototype.map.call(b, function(x){ return (x+256).toString(16).slice(1); }).join('');
+  return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);
+}
+function pad(n){ return (n<10?'0':'')+n; }
+function ymd(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function nowDate(){ return window.__NOW ? new Date(window.__NOW) : new Date(); }
+function today(){ return ymd(nowDate()); }
+function nowISO(){ return nowDate().toISOString(); }
+function parseYmd(s){ var p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function addDays(s, n){ var d = parseYmd(s); d.setDate(d.getDate()+n); return ymd(d); }
+function addMonths(s, n){
+  var d = parseYmd(s), day = d.getDate();
+  var t = new Date(d.getFullYear(), d.getMonth()+n, 1);
+  var last = new Date(t.getFullYear(), t.getMonth()+1, 0).getDate();
+  t.setDate(Math.min(day, last)); return ymd(t);
+}
+var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function niceDate(s){ var d = parseYmd(s); return DAYS[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]; }
+function startOfWeek(s){ var d = parseYmd(s), wd = (d.getDay()+6)%7; d.setDate(d.getDate()-wd); return ymd(d); }
+function startOfMonth(s){ return s.slice(0,8)+'01'; }
+/* database times have 6 decimal places; trim to 3 so every phone reads them the same way */
+function tsMs(s){ return Date.parse(String(s).replace(' ','T').replace(/(\.\d{3})\d+/, '$1')); }
+function localDayOf(iso){ return ymd(new Date(tsMs(iso))); }
+function timeOf(iso){ var d = new Date(tsMs(iso)); return pad(d.getHours())+':'+pad(d.getMinutes()); }
+function whenLabel(iso){
+  var d = localDayOf(iso), t = today();
+  if(d===t) return 'Today '+timeOf(iso);
+  if(d===addDays(t,-1)) return 'Yesterday '+timeOf(iso);
+  return niceDate(d)+' '+timeOf(iso);
+}
+function agoLabel(iso){
+  var days = Math.round((parseYmd(today()) - parseYmd(localDayOf(iso))) / 864e5);
+  if(days<=0) return 'today';
+  if(days===1) return 'yesterday';
+  if(days<14) return days+' days ago';
+  if(days<60) return Math.round(days/7)+' weeks ago';
+  return Math.round(days/30)+' months ago';
+}
+
+/* Same rule as the database's _next_due function. Keep the two in step. */
+function nextDue(type, every, from, due, doneDay){
+  if(type==='none') return null;
+  every = Math.max(1, parseInt(every,10)||1);
+  var base = (from==='after_done' || !due) ? doneDay : due;
+  for(var k=1; k<=1000; k++){
+    var n = type==='daily' ? addDays(base, k*every) : type==='weekly' ? addDays(base, k*every*7) : addMonths(base, k*every);
+    if(n > doneDay) return n;
+  }
+  return null;
+}
+
+function person(id){ for(var i=0;i<state.people.length;i++) if(state.people[i].id===id) return state.people[i]; return null; }
+function partner(){
+  for(var i=0;i<state.people.length;i++) if(state.me && state.people[i].id!==state.me.id) return state.people[i];
+  return {id:null, name:'Partner', colour:'#E0567F'};
+}
+function myRecord(){ return person(state.me.id) || {id:state.me.id, name:state.me.name, colour:state.me.colour}; }
+function otherOf(id){ for(var i=0;i<state.people.length;i++) if(state.people[i].id!==id) return state.people[i].id; return id; }
+function chore(id){ for(var i=0;i<state.chores.length;i++) if(state.chores[i].id===id) return state.chores[i]; return null; }
+function activeChores(){ return state.chores.filter(function(c){ return !c.archived && !c.finished; }); }
+
+/* ---------- away mode ---------- */
+function isAway(p, day){
+  day = day || today();
+  return !!(p && p.away_from && day >= p.away_from && (!p.away_until || day <= p.away_until));
+}
+/* who a chore really belongs to today (an away person's chores can be handed over) */
+function ownerOf(c){
+  if(!c.assigned_to) return null;
+  var p = person(c.assigned_to);
+  if(p && isAway(p) && p.away_mode==='handover') return otherOf(p.id);
+  return c.assigned_to;
+}
+function isPaused(c){ var p = c.assigned_to && person(c.assigned_to); return !!(p && isAway(p) && p.away_mode==='pause'); }
+function isCovering(c){ return !!(c.assigned_to && ownerOf(c)!==c.assigned_to); }
+function isMine(c){ var o = ownerOf(c); return !o || o===state.me.id; }
+function isPartners(c){ var o = ownerOf(c), p = partner(); return !o || o===p.id; }
+function isLate(c){
+  if(!c.next_due || isPaused(c)) return false;
+  var t = today();
+  if(c.next_due < t) return true;
+  if(c.next_due===t && c.due_time){ var n = nowDate(); return c.due_time < pad(n.getHours())+':'+pad(n.getMinutes()); }
+  return false;
+}
+function waitingForMe(){ var t = today(); return activeChores().filter(function(c){ return isMine(c) && !isPaused(c) && c.next_due && c.next_due <= t; }).sort(byDue); }
+function byDue(a,b){
+  var da = a.next_due||'9999', dbb = b.next_due||'9999';
+  if(da!==dbb) return da<dbb?-1:1;
+  var ta = a.due_time||'99', tb = b.due_time||'99';
+  if(ta!==tb) return ta<tb?-1:1;
+  return a.title.localeCompare(b.title);
+}
+function repeatLabel(c){
+  if(c.repeat_type==='none') return 'One-off';
+  var n = c.repeat_every||1, u = {daily:'day',weekly:'week',monthly:'month'}[c.repeat_type];
+  var s = n===1 ? 'Every '+u : 'Every '+n+' '+u+'s';
+  return s + (c.repeat_from==='after_done' ? ' after done' : '') + (c.rotate ? ' · taking turns' : '');
+}
+function dueLabel(c){
+  if(!c.next_due) return 'No date';
+  var t = today(), s;
+  if(c.next_due < t) s = 'Overdue · '+niceDate(c.next_due);
+  else if(c.next_due===t) s = 'Today';
+  else if(c.next_due===addDays(t,1)) s = 'Tomorrow';
+  else s = niceDate(c.next_due);
+  if(c.due_time) s += ' · '+c.due_time;
+  return s;
+}
+function effortDots(e){ return '<span class="effort" title="Effort">'+['','●','●●','●●●'][e||1]+'</span>'; }
+function allRooms(){
+  var out = [], seen = {};
+  function add(r){ if(r && !seen[r]){ seen[r]=1; out.push(r); } }
+  (state.settings.roomOrder||[]).forEach(add);
+  DEFAULT_ROOMS.forEach(add);
+  state.chores.forEach(function(c){ if(!c.archived) add(c.room); });
+  return out;
+}
+function roomHidden(r){ return (state.settings.hiddenRooms||[]).indexOf(r) >= 0; }
+function commentsFor(id){ return state.comments.filter(function(m){ return m.chore_id===id; }).sort(function(a,b){ return tsMs(a.created_at)-tsMs(b.created_at); }); }
+function mediaFor(id){ return state.attachments.filter(function(a){ return a.chore_id===id; }); }
+function list(c){ return Array.isArray(c.checklist) ? c.checklist : []; }
+function whoChip(p, small){ return p ? '<span class="who'+(small?' sm':'')+'" style="background:'+esc(p.colour)+'">'+esc(p.name.charAt(0))+'</span>' : ''; }
+
+/* ---------- icons ---------- */
+function icon(name, size){
+  size = size||20;
+  var p = {
+    list:'<path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4.5" cy="6" r="1.5" fill="currentColor"/><circle cx="4.5" cy="12" r="1.5" fill="currentColor"/><circle cx="4.5" cy="18" r="1.5" fill="currentColor"/>',
+    plus:'<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',
+    check:'<path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    back:'<path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    up:'<path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    down:'<path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    x:'<path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+    gear:'<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M19.4 13.5a7.4 7.4 0 000-3l1.9-1.5-2-3.4-2.3.9a7.4 7.4 0 00-2.6-1.5L14 2.5h-4l-.4 2.5a7.4 7.4 0 00-2.6 1.5l-2.3-.9-2 3.4L4.6 10.5a7.4 7.4 0 000 3L2.7 15l2 3.4 2.3-.9c.8.7 1.6 1.2 2.6 1.5l.4 2.5h4l.4-2.5a7.4 7.4 0 002.6-1.5l2.3.9 2-3.4z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/>',
+    scale:'<path d="M12 4v16M7 20h10M5 8h14M5 8l-3 6a3 3 0 006 0zM19 8l-3 6a3 3 0 006 0z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/>',
+    skip:'<path d="M5 6l8 6-8 6zM16 6v12" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linejoin="round" stroke-linecap="round"/>',
+    snooze:'<circle cx="12" cy="13" r="7" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 9v4l2.5 2M5 4L2.5 6.5M19 4l2.5 2.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
+    swap:'<path d="M7 7h12l-3-3M17 17H5l3 3" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    pencil:'<path d="M4 20l1-4L16.5 4.5a2 2 0 013 0a2 2 0 010 3L8 19z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
+    trash:'<path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
+    share:'<path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    cal:'<rect x="3.5" y="5" width="17" height="15" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    camera:'<path d="M4 8h3l1.5-2h7L17 8h3v11H4z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.2" stroke="currentColor" stroke-width="1.8" fill="none"/>',
+    clip:'<path d="M20 11l-8.5 8.5a5 5 0 01-7-7L13 4a3.5 3.5 0 015 5l-8.5 8.5a2 2 0 01-3-3L14 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
+    chat:'<path d="M4 5h16v11H9l-5 4z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
+    box:'<rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8 12l3 3 5-6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    paste:'<rect x="6" y="4" width="12" height="17" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    play:'<path d="M8 5l12 7-12 7z" fill="currentColor"/>',
+    bell:'<path d="M6 16V11a6 6 0 0112 0v5l2 2H4zM10 20a2 2 0 004 0" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>'
+  };
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" aria-hidden="true">'+(p[name]||'')+'</svg>';
+}
+function brainSVG(size){
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 64 64" aria-hidden="true">'+
+    '<path d="M30 13c-4-4-12-3-14 3-6 0-10 6-8 11-4 3-4 10 1 13-1 6 5 11 11 9 2 4 8 5 10 1z" fill="#FF8FB1" stroke="#B8396A" stroke-width="2.4" stroke-linejoin="round"/>'+
+    '<path d="M34 13c4-4 12-3 14 3 6 0 10 6 8 11 4 3 4 10-1 13 1 6-5 11-11 9-2 4-8 5-10 1z" fill="#FF8FB1" stroke="#B8396A" stroke-width="2.4" stroke-linejoin="round"/>'+
+    '<path d="M16 16c3 1 5 4 4 8M9 28c4-1 8 1 9 5M12 41c2-3 6-4 9-3M22 26c3 1 5 4 4 8M24 45c0-3 2-5 5-6" stroke="#B8396A" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
+    '<path d="M48 16c-3 1-5 4-4 8M55 28c-4-1-8 1-9 5M52 41c-2-3-6-4-9-3M42 26c-3 1-5 4-4 8M40 45c0-3-2-5-5-6" stroke="#B8396A" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
+  '</svg>';
+}
+
+/* =====================================================================
+   LOCAL CHANGES. Each change is applied to the phone straight away,
+   saved on the phone, then queued to send to Supabase.
+   ===================================================================== */
+function applySave(c){
+  var cur = chore(c.id);
+  if(!cur){ state.chores.push(c); return; }
+  if(!cur.updated_at || !c.updated_at || tsMs(c.updated_at) >= tsMs(cur.updated_at)){
+    var oldList = list(cur);
+    for(var k in c) cur[k] = c[k];
+    /* ticks on checklist items are kept (they change through their own tick) */
+    cur.checklist = list(c).map(function(it){
+      var o = oldList.filter(function(x){ return x.id===it.id; })[0];
+      return o ? Object.assign({}, it, {done:o.done, done_by:o.done_by, done_at:o.done_at}) : it;
+    });
+  }
+}
+function sameDue(a, b){ return (a||'') === (b||''); }
+function applyComplete(a){
+  if(state.completions.some(function(x){ return x.id===a.id; })) return false;
+  if(state.completions.some(function(x){ return x.chore_id===a.chore_id && sameDue(x.for_due_date, a.for_due); })) return false;
+  var c = chore(a.chore_id);
+  state.completions.unshift({id:a.id, chore_id:a.chore_id, done_by:a.done_by, done_at:a.done_at,
+    for_due_date:a.for_due||null, skipped:!!a.skipped, chore_title:c?c.title:'', effort:c?c.effort:1,
+    _prev_assigned:c?c.assigned_to:null, _prev_checklist:c?JSON.parse(JSON.stringify(list(c))):null});
+  if(c && !a.skipped){ c.last_done_at = a.done_at; c.last_done_by = a.done_by; }
+  if(c && sameDue(c.next_due, a.for_due) && !c.finished){
+    if(c.repeat_type==='none') c.finished = true;
+    else {
+      c.next_due = nextDue(c.repeat_type, c.repeat_every, c.repeat_from, c.next_due, a.today);
+      c.checklist = list(c).map(function(it){ return Object.assign({}, it, {done:false, done_by:null, done_at:null}); });
+      if(c.rotate && c.assigned_to && !a.skipped) c.assigned_to = otherOf(c.assigned_to);
+    }
+    c.updated_at = a.done_at;
+  }
+  return true;
+}
+function applyUndo(a){
+  var x = null;
+  state.completions = state.completions.filter(function(y){ if(y.id===a.id){ x = y; return false; } return true; });
+  if(!x) return;
+  var c = chore(x.chore_id);
+  if(!c) return;
+  var lastDone = state.completions.filter(function(y){ return y.chore_id===x.chore_id && !y.skipped; }).sort(function(p,q){ return tsMs(q.done_at)-tsMs(p.done_at); })[0];
+  c.last_done_at = lastDone ? lastDone.done_at : null; c.last_done_by = lastDone ? lastDone.done_by : null;
+  var later = state.completions.some(function(y){ return y.chore_id===x.chore_id && (y.for_due_date||'') > (x.for_due_date||''); });
+  if(!later){
+    c.next_due = x.for_due_date; c.finished = false; c.updated_at = nowISO();
+    if(x._prev_assigned !== undefined) c.assigned_to = x._prev_assigned;
+    if(x._prev_checklist) c.checklist = x._prev_checklist;
+  }
+}
+function applyToggle(a){
+  var c = chore(a.chore_id); if(!c) return;
+  c.checklist = list(c).map(function(it){ return it.id===a.item_id ? Object.assign({}, it, {done:a.done, done_by:a.done?a.by:null, done_at:a.done?a.at:null}) : it; });
+}
+function applyOp(op){
+  var a = op.args;
+  if(op.type==='save') applySave(JSON.parse(JSON.stringify(a.chore)));
+  else if(op.type==='complete') applyComplete(a);
+  else if(op.type==='undo') applyUndo(a);
+  else if(op.type==='toggle') applyToggle(a);
+  else if(op.type==='comment'){ if(!state.comments.some(function(m){ return m.id===a.id; })) state.comments.push({id:a.id, chore_id:a.chore_id, person_id:a.by, body:a.body, created_at:a.at, _pending:true}); }
+  else if(op.type==='del_comment') state.comments = state.comments.filter(function(m){ return m.id!==a.id; });
+  else if(op.type==='upload'){ if(!state.attachments.some(function(x){ return x.id===a.id; })) state.attachments.push({id:a.id, chore_id:a.chore_id, kind:a.kind, mime:a.mime, created_by:a.by, created_at:a.at, _pending:true}); if(a.thumb) state.thumbs[a.id] = a.thumb; }
+  else if(op.type==='del_attachment') state.attachments = state.attachments.filter(function(x){ return x.id!==a.id; });
+  else if(op.type==='away'){ var p = person(state.me.id); if(p){ p.away_from = a.from; p.away_until = a.until; p.away_mode = a.from ? a.mode : null; } }
+  else if(op.type==='reminders'){ var r = person(state.me.id); if(r){ r.remind_hour = a.hour; r.notify_partner = a.notify; } }
+}
+async function saveCache(){
+  try{ await kvSet('cache', {people:state.people, chores:state.chores, completions:state.completions, comments:state.comments,
+    attachments:state.attachments, lastSync:state.lastSync, version:state.version}); }catch(e){}
+}
+async function change(type, args){
+  var op = {type:type, args:args, attempts:0, createdAt:nowISO()};
+  applyOp(op);
+  try{ await qAdd(op); }catch(e){ console.error('Could not queue change', e); }
+  state.queue = await qAll().catch(function(){ return state.queue; });
+  await saveCache();
+  render();
+  syncNow();
+}
+
+/* =====================================================================
+   SYNC: send the queue in order, then fetch the latest from Supabase.
+   ===================================================================== */
+function isNetworkError(err){
+  if(!err) return false;
+  if(err.network) return true;
+  var m = String(err.message||err);
+  return (!err.code && !err.status) || /fetch|network|load failed|abort|timed? ?out/i.test(m);
+}
+async function rpcOrThrow(client, fn, args){
+  var res = await client.rpc(fn, args);
+  if(res.error) throw res.error;
+  return res.data;
+}
+async function uploadMedia(client, a){
+  var m = await mediaGet(a.id);
+  if(!m) return 'drop';                                      /* the file is no longer on this phone */
+  state.uploading = a.id; safeRender();
+  var link = await callFn({action:'upload', chore_id:a.chore_id, ext:a.ext});
+  var body = await m.blob.arrayBuffer();
+  var up = await client.storage.from('chore-media').uploadToSignedUrl(link.path, link.token, body, {contentType:a.mime||'application/octet-stream'});
+  if(up.error){
+    var e = new Error(up.error.message || up.error.error || 'Upload failed');
+    e.status = up.error.statusCode ? +up.error.statusCode : 400;
+    if(/maximum allowed size|too large|payload/i.test(e.message)) e.tooBig = true;
+    throw e;
+  }
+  await rpcOrThrow(client, 'add_attachment', {p_code:state.me.code, p_id:a.id, p_chore_id:a.chore_id, p_path:link.path,
+    p_kind:a.kind, p_mime:a.mime, p_size:a.size, p_thumb:a.thumb||null});
+  await mediaDel(a.id);
+  state.uploading = null;
+}
+async function sendOp(client, op){
+  var a = op.args, code = state.me.code;
+  switch(op.type){
+    case 'save': await rpcOrThrow(client, 'save_chore', {p_code:code, p_chore:a.chore}); break;
+    case 'complete': await rpcOrThrow(client, 'complete_chore', {p_code:code, p_id:a.id, p_chore_id:a.chore_id, p_for_due:a.for_due||null, p_skipped:!!a.skipped, p_done_at:a.done_at, p_today:a.today}); break;
+    case 'undo': await rpcOrThrow(client, 'undo_completion', {p_code:code, p_id:a.id}); break;
+    case 'toggle': await rpcOrThrow(client, 'toggle_item', {p_code:code, p_chore_id:a.chore_id, p_item_id:a.item_id, p_done:a.done, p_at:a.at}); break;
+    case 'comment': await rpcOrThrow(client, 'add_comment', {p_code:code, p_id:a.id, p_chore_id:a.chore_id, p_body:a.body, p_at:a.at}); break;
+    case 'del_comment': await rpcOrThrow(client, 'delete_comment', {p_code:code, p_id:a.id}); break;
+    case 'del_attachment': await rpcOrThrow(client, 'delete_attachment', {p_code:code, p_id:a.id}); await mediaDel(a.id).catch(function(){}); break;
+    case 'away': await rpcOrThrow(client, 'set_away', {p_code:code, p_from:a.from||null, p_until:a.until||null, p_mode:a.mode||null}); break;
+    case 'reminders': await rpcOrThrow(client, 'set_reminders', {p_code:code, p_hour:a.hour, p_notify_partner:a.notify}); break;
+    case 'upload': return await uploadMedia(client, a);
+  }
+}
+/* after a change reaches the database, tell the other phone if it needs to know */
+function notifyAfter(op){
+  var a = op.args;
+  if(op.type==='save' && a.notify) callFn({action:'notify', kind:'assigned', title:a.chore.title, chore_id:a.chore.id}).catch(function(){});
+  if(op.type==='comment'){ var c = chore(a.chore_id); callFn({action:'notify', kind:'comment', title:c?c.title:'a chore', text:a.body, chore_id:a.chore_id}).catch(function(){}); }
+}
+async function flushQueue(client){
+  var ops = await qAll(), allSent = true;
+  for(var i=0;i<ops.length;i++){
+    var op = ops[i], err = null, res;
+    try{ res = await sendOp(client, op); }catch(e){ err = e; }
+    if(op.type==='upload') state.uploading = null;
+    if(!err){ await qDel(op.seq); if(res!=='drop') notifyAfter(op); continue; }
+    if(isNetworkError(err)) return false;                     /* no signal: try again later */
+    if(err.code==='28000'){ await forceLogout(); return false; }
+    console.error('Change refused', op.type, err);
+    op.attempts = (op.attempts||0)+1;
+    op.lastError = err.tooBig ? 'too big' : (err.noFunction ? 'no function' : String(err.message||err).slice(0,120));
+    var keep = op.type==='upload' && !err.tooBig && op.attempts < 50;  /* uploads keep trying (e.g. until the function is set up) */
+    if(!keep && op.attempts >= 5 || err.tooBig){
+      await qDel(op.seq); state.failedOps++;
+      if(op.type==='upload'){ await mediaDel(op.args.id).catch(function(){}); state.attachments = state.attachments.filter(function(x){ return x.id!==op.args.id; }); toast(err.tooBig ? 'That video is too big for your Supabase plan.' : 'A photo or video could not be uploaded.'); }
+    } else await qPut(op);
+    allSent = false;
+    if(op.type!=='upload') return false;                      /* keep later changes in order behind this one */
+  }
+  return allSent;
+}
+async function pull(client, force){
+  var ver = await client.rpc('get_version', {p_code:state.me.code});
+  if(ver.error){ if(ver.error.code==='28000') await forceLogout(); return false; }
+  if(!force && state.version!==null && ver.data===state.version && state.lastSync) { state.lastSync = nowISO(); return true; }
+  var res = await client.rpc('get_state', {p_code:state.me.code});
+  if(res.error){ if(res.error.code==='28000') await forceLogout(); return false; }
+  var d = res.data || {};
+  state.people = d.people || [];
+  state.chores = d.chores || [];
+  state.completions = d.completions || [];
+  state.comments = d.comments || [];
+  state.attachments = d.attachments || [];
+  state.version = d.version;
+  /* anything still waiting to send is laid back on top, so it never vanishes */
+  var pending = await qAll();
+  pending.forEach(applyOp);
+  state.queue = pending;
+  state.lastSync = nowISO();
+  await saveCache();
+  await fetchThumbs(client);
+  return true;
+}
+async function fetchThumbs(client){
+  var missing = state.attachments.filter(function(a){ return !a._pending && !state.thumbs[a.id]; }).map(function(a){ return a.id; });
+  if(!missing.length) return;
+  var res = await client.rpc('get_thumbs', {p_code:state.me.code, p_ids:missing});
+  if(res.error || !res.data) return;
+  for(var k in res.data) state.thumbs[k] = res.data[k];
+  try{ await kvSet('thumbs', state.thumbs); }catch(e){}
+}
+async function syncNow(force){
+  if(state.syncing || !state.me) return;
+  if(!window.supabase && navigator.onLine) await ensureLib();
+  var client = getClient();
+  state.online = navigator.onLine;
+  if(!client || !state.online){ state.queue = await qAll().catch(function(){ return state.queue; }); safeRender(); return; }
+  state.syncing = true;
+  try{
+    await flushQueue(client);
+    if(state.me) await pull(client, force);
+    if(state.fnOk===null && state.me) checkFunction();
+  }catch(e){ console.error('Sync failed, will retry', e); }
+  state.syncing = false;
+  state.queue = await qAll().catch(function(){ return state.queue; });
+  safeRender();
+}
+async function checkFunction(){
+  try{ var r = await callFn({action:'ping'}); state.fnOk = true; state.vapidKey = r.vapidPublicKey; await kvSet('vapid', r.vapidPublicKey); }
+  catch(e){ if(!e.network) state.fnOk = false; }
+  safeRender();
+}
+/* don't redraw under someone's fingers while they are typing */
+function safeRender(){
+  var a = document.activeElement;
+  if(state.screen==='edit' || state.screen==='paste' || (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && document.getElementById('app').contains(a))){ state.pendingRender = true; return; }
+  render();
+}
+document.addEventListener('focusout', function(){ setTimeout(function(){ if(state.pendingRender) safeRender(); }, 400); });
+async function forceLogout(){
+  await qClear().catch(function(){}); await mediaClear().catch(function(){});
+  await kvDel('auth').catch(function(){}); await kvDel('cache').catch(function(){});
+  state.me = null; state.people=[]; state.chores=[]; state.completions=[]; state.comments=[]; state.attachments=[]; state.queue=[];
+  state.screen = 'login'; state.version = null;
+  state.loginError = 'Your access code has changed. Please log in again.';
+  render();
+}
+
+/* =====================================================================
+   SCREENS
+   ===================================================================== */
+function header(){
+  var pend = state.queue.length, cls = '', txt = 'Up to date';
+  if(!state.online){ cls='offline'; txt = pend ? 'Offline · '+pend+' to send' : 'Offline'; }
+  else if(state.uploading){ cls='pending'; txt = 'Uploading…'; }
+  else if(pend){ cls='pending'; txt = pend+' to send'; }
+  else if(state.syncing){ txt = 'Syncing'; }
+  var names = state.me ? esc(state.me.name)+' &amp; '+esc(partner().name) : '';
+  return '<div class="header"><div class="brand">'+brainSVG(34)+
+    '<div class="brand-title">Brain Dump<span>'+names+'</span></div></div>'+
+    '<button class="sync-pill '+cls+'" onclick="App.syncNow()" aria-label="Sync now"><span class="dot"></span>'+txt+'</button></div>';
+}
+function nav(){
+  var n = waitingForMe().length, s = state.screen;
+  var h = '<div class="bottom-nav">';
+  h += '<button class="'+(s==='home'||s==='detail'?'active':'')+'" onclick="App.go(\'home\')">'+icon('list',22)+'<span>Chores</span>'+(n?'<span class="nav-dot" data-testid="nav-badge">'+n+'</span>':'')+'</button>';
+  if(state.settings.showFairness) h += '<button class="'+(s==='fair'?'active':'')+'" onclick="App.go(\'fair\')">'+icon('scale',22)+'<span>Fairness</span></button>';
+  h += '<button class="'+(s==='settings'||s==='arrange'?'active':'')+'" onclick="App.go(\'settings\')">'+icon('gear',22)+'<span>Settings</span></button>';
+  return h + '</div>';
+}
+
+function screenLogin(){
+  var h = '<div class="login-wrap">'+brainSVG(96)+'<h1>Brain Dump</h1><p>Chores for two. Enter your personal access code.</p>';
+  if(!CONFIGURED) h += '<div class="notice">This copy of the app is not connected to a database yet. Put the Supabase URL and key near the top of index.html (see the setup guide).</div>';
+  h += '<input type="password" id="codeInput" placeholder="Access code" autocomplete="off" autocapitalize="characters" onkeydown="if(event.key===\'Enter\')App.login()">';
+  if(state.loginError) h += '<div class="err">'+esc(state.loginError)+'</div>';
+  h += '<button class="btn btn-primary" onclick="App.login()" '+(state.loginBusy?'disabled':'')+'>'+(state.loginBusy?'Checking…':'Log in')+'</button>';
+  return h + '<div style="font-size:11px;color:var(--neutral-dim);margin-top:24px;">'+APP_VERSION+'</div></div>';
+}
+
+function choreRow(c, tab){
+  var late = isLate(c), paused = isPaused(c);
+  var who = '';
+  if(!c.assigned_to) who = '<span class="who either">Either</span>';
+  else if(isCovering(c)) who = whoChip(person(c.assigned_to));
+  var items = list(c), done = items.filter(function(i){ return i.done; }).length;
+  var nC = commentsFor(c.id).length, nM = mediaFor(c.id).length;
+  var lastBy = c.last_done_by && person(c.last_done_by);
+  var sub = '<span class="'+(late?'late':'')+'">'+esc(paused?'Paused · '+dueLabel(c):dueLabel(c))+'</span><span>'+esc(c.room)+'</span><span>↻ '+esc(repeatLabel(c))+'</span>'+effortDots(c.effort);
+  if(items.length) sub += '<span class="meta">'+icon('box',13)+done+'/'+items.length+'</span>';
+  if(nM) sub += '<span class="meta">'+icon('clip',13)+nM+'</span>';
+  if(nC) sub += '<span class="meta">'+icon('chat',13)+nC+'</span>';
+  if(c.last_done_at) sub += '<span>Last done '+esc(agoLabel(c.last_done_at))+(lastBy?' · '+esc(lastBy.name):'')+'</span>';
+  if(isCovering(c)) sub += '<span>Covering for '+esc(person(c.assigned_to).name)+'</span>';
+  return '<div class="chore'+(late?' late':'')+(paused?' paused':'')+'" data-chore="'+esc(c.title)+'">'+
+    '<button class="tick" aria-label="Mark '+esc(c.title)+' done" onclick="App.tick(\''+c.id+'\',this)">'+icon('check',18)+'</button>'+
+    '<div class="chore-main" onclick="App.openChore(\''+c.id+'\')">'+
+      '<div class="chore-title">'+esc(c.title)+'</div><div class="chore-sub">'+sub+'</div>'+
+    '</div>'+who+'</div>';
+}
+function groupByDate(list_){
+  var t = today(), tm = addDays(t,1), wk = addDays(t,6);
+  var g = [['Overdue',[]],['Today',[]],['Tomorrow',[]],['This week',[]],['Later',[]],['No date',[]],['Paused while away',[]]];
+  list_.forEach(function(c){
+    var d = c.next_due;
+    if(isPaused(c)) g[6][1].push(c);
+    else if(!d) g[5][1].push(c);
+    else if(d < t) g[0][1].push(c);
+    else if(d===t) g[1][1].push(c);
+    else if(d===tm) g[2][1].push(c);
+    else if(d<=wk) g[3][1].push(c);
+    else g[4][1].push(c);
+  });
+  return g.filter(function(x){ return x[1].length; });
+}
+function groupByRoom(list_){
+  return allRooms().map(function(r){ return [r, list_.filter(function(c){ return c.room===r; })]; }).filter(function(x){ return x[1].length; });
+}
+function awayBanner(){
+  var me = myRecord(), p = partner(), h = '';
+  if(isAway(me)) h += '<div class="banner">You\'re away'+(me.away_until?' until '+esc(niceDate(me.away_until)):'')+'. '+(me.away_mode==='pause'?'Your chores are paused.':'Your chores are with '+esc(p.name)+'.')+' <button class="linkish" onclick="App.go(\'settings\')">Change</button></div>';
+  if(p.id && isAway(p)) h += '<div class="banner">'+esc(p.name)+' is away'+(p.away_until?' until '+esc(niceDate(p.away_until)):'')+'. '+(p.away_mode==='pause'?esc(p.name)+'\'s chores are paused.':esc(p.name)+'\'s chores are on your list.')+'</div>';
+  return h;
+}
+function screenHome(){
+  var p = partner(), tab = state.tab;
+  var mine = activeChores().filter(isMine), theirs = activeChores().filter(isPartners);
+  var waiting = waitingForMe();
+  var h = awayBanner();
+  if(waiting.length && state.settings.showAttention && tab!=='done'){
+    var od = waiting.filter(function(c){ return c.next_due < today(); }).length;
+    h += '<div class="card att-card" data-testid="attention"><div class="eyebrow" style="color:#E5484D">Needs your attention</div>'+
+      '<div class="att-sum">'+waiting.length+' chore'+(waiting.length===1?'':'s')+' waiting for you'+(od?' · '+od+' overdue':'')+'</div>';
+    waiting.slice(0,3).forEach(function(c){
+      h += '<div class="att-row"><button class="tick" aria-label="Mark '+esc(c.title)+' done" onclick="App.tick(\''+c.id+'\',this)">'+icon('check',18)+'</button>'+
+        '<div class="t" onclick="App.openChore(\''+c.id+'\')">'+esc(c.title)+'<span>'+esc(dueLabel(c))+'</span></div></div>';
+    });
+    if(waiting.length>3) h += '<button class="linkish" onclick="App.setTab(\'mine\')">See all '+waiting.length+' in Mine</button>';
+    h += '</div>';
+  }
+  h += '<div class="tabs">'+
+    '<button class="'+(tab==='mine'?'active':'')+'" onclick="App.setTab(\'mine\')">Mine'+(waiting.length?'<span class="tab-dot">'+waiting.length+'</span>':'')+'</button>'+
+    '<button class="'+(tab==='partner'?'active':'')+'" onclick="App.setTab(\'partner\')">'+esc(p.name)+'</button>'+
+    '<button class="'+(tab==='done'?'active':'')+'" onclick="App.setTab(\'done\')">Done</button></div>';
+  if(tab==='done') return h + doneList();
+
+  var lst = (tab==='mine' ? mine : theirs).slice().sort(byDue);
+  var hiddenCount = 0;
+  if(!state.showHidden){ lst = lst.filter(function(c){ if(roomHidden(c.room)){ hiddenCount++; return false; } return true; }); }
+  var gb = state.settings.groupBy;
+  h += '<div class="subbar"><span>'+lst.length+' chore'+(lst.length===1?'':'s')+'</span>'+
+    '<span><button class="linkish" onclick="App.setGroup(\''+(gb==='date'?'room':'date')+'\')">Group by '+(gb==='date'?'room':'date')+'</button></span></div>';
+  if(!lst.length && !hiddenCount){
+    h += '<div class="empty">'+brainSVG(56)+'<br>'+(tab==='mine'?'Nothing on your list. Tap + to add a chore.':esc(p.name)+' has nothing on their list.')+'</div>';
+  }
+  var groups = gb==='room' ? groupByRoom(lst) : groupByDate(lst);
+  groups.forEach(function(g){
+    h += '<div class="group-h'+(g[0]==='Overdue'?' overdue':'')+'"><span>'+esc(g[0])+'</span><span>'+g[1].length+'</span></div>';
+    g[1].forEach(function(c){ h += choreRow(c, tab); });
+  });
+  if(hiddenCount) h += '<div class="hidden-note">'+hiddenCount+' in hidden rooms · <button class="linkish" onclick="App.toggleHidden()">Show</button></div>';
+  else if(state.showHidden && (state.settings.hiddenRooms||[]).length) h += '<div class="hidden-note"><button class="linkish" onclick="App.toggleHidden()">Hide hidden rooms again</button></div>';
+  return h;
+}
+function doneList(){
+  var wk = startOfWeek(today()), lastWk = addDays(wk, -7);
+  var items = state.completions.filter(function(x){ return localDayOf(x.done_at) >= lastWk; })
+    .sort(function(a,b){ return tsMs(b.done_at) - tsMs(a.done_at); });
+  if(!items.length) return '<div class="empty">Nothing ticked off yet this week.</div>';
+  var h = '', lastDay = null, t = today();
+  items.forEach(function(x){
+    var d = localDayOf(x.done_at);
+    if(d!==lastDay){
+      if(lastDay!==null) h += '</div>';
+      var label = d===t ? 'Today' : d===addDays(t,-1) ? 'Yesterday' : niceDate(d);
+      if(lastDay===null || (lastDay>=wk && d<wk)) h += '<div class="group-h"><span>'+(d>=wk?'This week':'Last week')+'</span></div>';
+      h += '<div class="card" style="padding:4px 14px;"><div class="eyebrow" style="margin:10px 0 2px;">'+label+'</div>';
+      lastDay = d;
+    }
+    var p = person(x.done_by), c = chore(x.chore_id);
+    var title = (c && c.title) || x.chore_title || 'Chore';
+    h += '<div class="done-row">'+whoChip(p)+
+      '<div class="t'+(x.skipped?' skipped':'')+'">'+esc(title)+'<span>'+(x.skipped?'Skipped':'Done')+' by '+esc(p?p.name:'?')+' · '+timeOf(x.done_at)+'</span></div>'+
+      '<button class="small-btn" onclick="App.undo(\''+x.id+'\')">Undo</button></div>';
+  });
+  return h + '</div>';
+}
+
+/* ---------- chore detail ---------- */
+function screenDetail(){
+  var c = chore(state.detailId);
+  if(!c || c.archived) return '<button class="top-back" onclick="App.go(\'home\')">'+icon('back',18)+'Chores</button><div class="empty">This chore has been deleted.</div>';
+  var me = state.me, p = partner(), late = isLate(c), owner = c.assigned_to ? person(c.assigned_to) : null;
+  var h = '<button class="top-back" onclick="App.go(\'home\')">'+icon('back',18)+'Chores</button>';
+  h += '<div class="detail-title">'+esc(c.title)+'</div>';
+  h += '<div class="detail-sub"><span class="'+(late?'late':'')+'">'+esc(c.finished?'Done':dueLabel(c))+'</span><span>'+esc(c.room)+'</span><span>↻ '+esc(repeatLabel(c))+'</span>'+effortDots(c.effort)+'</div>';
+  if(c.notes) h += '<div class="notes">'+esc(c.notes)+'</div>';
+  var lastBy = c.last_done_by && person(c.last_done_by);
+  h += '<div class="hint" style="margin:0 0 12px">'+(c.last_done_at ? 'Last done '+esc(agoLabel(c.last_done_at))+(lastBy?' by '+esc(lastBy.name):'')+' ('+esc(whenLabel(c.last_done_at))+')' : 'Not done yet')+
+    (isCovering(c)?' · '+esc(owner.name)+' is away, so this is with '+esc(person(ownerOf(c)).name):'')+(isPaused(c)?' · Paused while '+esc(owner.name)+' is away':'')+'</div>';
+
+  if(!c.finished){
+    h += '<div class="btn-row"><button class="btn btn-primary" onclick="App.tick(\''+c.id+'\')">'+icon('check',18)+'Done</button></div>';
+    h += '<div class="btn-row">'+(c.repeat_type!=='none'?'<button class="btn btn-secondary btn-slim" onclick="App.skip(\''+c.id+'\')">'+icon('skip',16)+'Skip this time</button>':'')+
+      '<button class="btn btn-secondary btn-slim" onclick="App.snooze(\''+c.id+'\')">'+icon('snooze',16)+'Snooze to tomorrow</button></div>';
+  }
+  h += '<label class="lbl" style="margin-top:6px">Whose job?</label><div class="seg">'+
+    '<button class="'+(c.assigned_to===me.id?'active':'')+'" onclick="App.assign(\''+c.id+'\',\''+me.id+'\')">'+(c.assigned_to===me.id?esc(me.name):'Make it mine')+'</button>'+
+    (p.id?'<button class="'+(c.assigned_to===p.id?'active':'')+'" onclick="App.assign(\''+c.id+'\',\''+p.id+'\')">'+(c.assigned_to===p.id?esc(p.name):'Give it to '+esc(p.name))+'</button>':'')+
+    '<button class="'+(!c.assigned_to?'active':'')+'" onclick="App.assign(\''+c.id+'\',\'\')">'+(!c.assigned_to?'Either':'Either of us')+'</button></div>';
+
+  /* checklist */
+  var items = list(c), nd = items.filter(function(i){ return i.done; }).length;
+  h += '<div class="card"><div class="eyebrow"><span>Checklist</span><span>'+(items.length?nd+' of '+items.length:'')+'</span></div>';
+  items.forEach(function(it){
+    var by = it.done && it.done_by ? person(it.done_by) : null;
+    h += '<div class="ck-row'+(it.done?' done':'')+'"><button class="ck-box'+(it.done?' on':'')+'" aria-label="Tick '+esc(it.text)+'" onclick="App.toggleItem(\''+c.id+'\',\''+esc(it.id)+'\')">'+icon('check',16)+'</button>'+
+      '<span class="t">'+esc(it.text)+'</span>'+(by?'<span class="by">'+esc(by.name)+'</span>':'')+'</div>';
+  });
+  if(!items.length) h += '<div class="hint" style="margin:0">No checklist yet. Add items below, or paste a list from a note.</div>';
+  h += '<div class="add-row"><input type="text" id="itemInput" placeholder="Add an item" value="'+esc(state.itemDraft)+'" oninput="App.draft(\'itemDraft\',this.value)" onkeydown="if(event.key===\'Enter\')App.addItem(\''+c.id+'\')">'+
+    '<button class="btn btn-secondary btn-slim" onclick="App.addItem(\''+c.id+'\')">Add</button></div>'+
+    '<button class="linkish" onclick="App.pasteIntoChecklist(\''+c.id+'\')">'+'Paste a list from a note</button></div>';
+
+  /* photos and videos */
+  var media = mediaFor(c.id);
+  h += '<div class="card"><div class="eyebrow"><span>Photos and videos</span><span>'+(media.length||'')+'</span></div>';
+  if(state.fnOk===false) h += '<div class="notice">Photos and videos need the Brain Dump function in Supabase. See step 4 of the setup guide.</div>';
+  h += '<div class="media-grid">';
+  media.forEach(function(m){
+    var th = state.thumbs[m.id];
+    h += '<div class="media" onclick="App.viewMedia(\''+m.id+'\')" data-media="'+m.id+'">'+(th?'<img src="'+esc(th)+'" alt="">':icon(m.kind==='video'?'play':'camera',28))+
+      (m.kind==='video'&&th?'<span class="play">'+icon('play',30)+'</span>':'')+
+      (m._pending?'<span class="tag">'+(state.uploading===m.id?'Uploading…':'Waiting to send')+'</span>':'')+'</div>';
+  });
+  if(state.fnOk!==false) h += '<label class="media media-add">'+icon('camera',24)+'Add photo or video<input type="file" accept="image/*,video/*" multiple onchange="App.addMedia(\''+c.id+'\',this)"></label>';
+  h += '</div></div>';
+
+  /* comments */
+  var cms = commentsFor(c.id);
+  h += '<div class="card"><div class="eyebrow"><span>Comments</span><span>'+(cms.length||'')+'</span></div>';
+  cms.forEach(function(m){
+    var by = person(m.person_id);
+    h += '<div class="cm"><div class="h">'+whoChip(by, true)+'<b>'+esc(by?by.name:'?')+'</b><span>'+esc(whenLabel(m.created_at))+'</span>'+
+      (m._pending?'<span class="pend">waiting to send</span>':'')+
+      (m.person_id===me.id?'<button class="linkish" style="margin-left:auto;font-size:12px" onclick="App.deleteComment(\''+m.id+'\')">Delete</button>':'')+'</div>'+
+      '<div class="b">'+esc(m.body)+'</div></div>';
+  });
+  if(!cms.length) h += '<div class="hint" style="margin:0 0 6px">No comments yet.</div>';
+  h += '<textarea id="commentInput" placeholder="Write a comment" style="margin:10px 0 8px;min-height:48px" oninput="App.draft(\'commentDraft\',this.value)">'+esc(state.commentDraft)+'</textarea>'+
+    '<button class="btn btn-secondary btn-slim" onclick="App.sendComment(\''+c.id+'\')">Send comment</button></div>';
+
+  /* history */
+  var hist = state.completions.filter(function(x){ return x.chore_id===c.id; }).sort(function(a,b){ return tsMs(b.done_at)-tsMs(a.done_at); }).slice(0,6);
+  if(hist.length){
+    h += '<div class="card"><div class="eyebrow">History</div>';
+    hist.forEach(function(x){ var by = person(x.done_by); h += '<div class="list-line"><span>'+(x.skipped?'Skipped':'Done')+' by '+esc(by?by.name:'?')+'</span><span>'+esc(whenLabel(x.done_at))+'</span></div>'; });
+    h += '</div>';
+  }
+
+  /* more */
+  h += '<div class="card" style="padding:4px 14px">'+
+    '<button class="opt-row" onclick="App.editChore(\''+c.id+'\')">'+icon('pencil',20)+'Edit</button>'+
+    (c.next_due?'<button class="opt-row" onclick="App.addToCalendar(\''+c.id+'\')">'+icon('cal',20)+'Add to calendar</button>':'')+
+    '<button class="opt-row danger" onclick="App.deleteChore(\''+c.id+'\')">'+icon('trash',20)+'Delete</button></div>';
+  return h;
+}
+
+/* ---------- fairness ---------- */
+function fairStats(from){
+  var res = {};
+  state.people.forEach(function(p){ res[p.id] = {p:p, done:0, points:0, skipped:0, titles:{}}; });
+  state.completions.forEach(function(x){
+    if(localDayOf(x.done_at) < from) return;
+    var r = res[x.done_by]; if(!r) return;
+    if(x.skipped){ r.skipped++; return; }
+    var c = chore(x.chore_id), title = (c&&c.title)||x.chore_title||'Chore';
+    r.done++; r.points += (x.effort||1);
+    r.titles[title] = (r.titles[title]||0)+1;
+  });
+  return state.people.map(function(p){ return res[p.id]; });
+}
+function rangeStart(){ return state.fairRange==='week' ? startOfWeek(today()) : startOfMonth(today()); }
+function rangeLabel(){ return state.fairRange==='week' ? 'Week of '+niceDate(startOfWeek(today())) : (function(){ var d=parseYmd(today()); return ['January','February','March','April','May','June','July','August','September','October','November','December'][d.getMonth()]+' '+d.getFullYear(); })(); }
+function screenFair(){
+  var stats = fairStats(rangeStart());
+  var maxP = Math.max.apply(null, [1].concat(stats.map(function(s){ return s.points; })));
+  var h = '<h1 class="page-title">Fairness</h1>'+
+    '<div class="seg"><button class="'+(state.fairRange==='week'?'active':'')+'" onclick="App.setRange(\'week\')">This week</button>'+
+    '<button class="'+(state.fairRange==='month'?'active':'')+'" onclick="App.setRange(\'month\')">This month</button></div>'+
+    '<div class="card"><div class="eyebrow">'+esc(rangeLabel())+'</div>';
+  stats.forEach(function(s){
+    h += '<div class="fair-row"><div class="fair-top">'+whoChip(s.p)+'<span class="n">'+esc(s.p.name)+'</span><span class="v">'+s.points+' pts</span></div>'+
+      '<div class="bar"><div style="width:'+Math.round(100*s.points/maxP)+'%;background:'+esc(s.p.colour)+'"></div></div>'+
+      '<div class="stat-grid"><div class="stat"><b>'+s.done+'</b><span>Chores</span></div><div class="stat"><b>'+s.points+'</b><span>Effort pts</span></div><div class="stat"><b>'+s.skipped+'</b><span>Skipped</span></div></div></div>';
+  });
+  h += '<div class="hint" style="margin:0;">Effort points: small chore 1, medium 2, big 3. Skips do not count.</div></div>';
+  stats.forEach(function(s){
+    var t = Object.keys(s.titles).sort(function(a,b){ return s.titles[b]-s.titles[a] || a.localeCompare(b); });
+    h += '<div class="card"><div class="eyebrow">What '+esc(s.p.name)+' did</div>';
+    if(!t.length) h += '<div style="font-size:14px;color:var(--neutral-dim)">Nothing yet.</div>';
+    t.forEach(function(k){ h += '<div class="list-line"><span>'+esc(k)+'</span><span>× '+s.titles[k]+'</span></div>'; });
+    h += '</div>';
+  });
+  h += '<button class="btn btn-primary" onclick="App.shareSummary()">'+icon('share',18)+'Share summary</button>';
+  return h;
+}
+function summaryText(){
+  var stats = fairStats(rangeStart());
+  var lines = ['Brain Dump – '+rangeLabel(), ''];
+  stats.forEach(function(s){ lines.push(s.p.name+': '+s.done+' chore'+(s.done===1?'':'s')+', '+s.points+' effort point'+(s.points===1?'':'s')+(s.skipped?' ('+s.skipped+' skipped)':'')); });
+  stats.forEach(function(s){
+    var t = Object.keys(s.titles);
+    if(t.length){ lines.push(''); lines.push(s.p.name+' did:'); t.forEach(function(k){ lines.push('• '+k+(s.titles[k]>1?' ×'+s.titles[k]:'')); }); }
+  });
+  return lines.join('\n');
+}
+
+/* ---------- settings ---------- */
+function isStandalone(){ return !!(window.navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches)); }
+function isIOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1); }
+function remindersCard(){
+  var me = myRecord(), ps = state.push, p = partner();
+  var h = '<div class="card"><div class="eyebrow"><span>Reminders</span>'+icon('bell',16)+'</div>';
+  if(!ps.supported){
+    h += '<div class="hint" style="margin:0">'+(isIOS() && !isStandalone() ? 'Add Brain Dump to your Home Screen first (Share, then Add to Home Screen), open it from there, then come back here to turn on reminders.' : 'Notifications are not available in this browser.')+'</div></div>';
+    return h;
+  }
+  if(state.fnOk===false) return h + '<div class="notice">Reminders need the Brain Dump function in Supabase. See step 4 of the setup guide.</div></div>';
+  if(!ps.subscribed){
+    h += '<div class="hint" style="margin:0 0 12px">Get a morning nudge for chores due today, and a message when '+esc(p.name)+' gives you a chore or comments.</div>'+
+      (ps.msg?'<div class="err">'+esc(ps.msg)+'</div>':'')+
+      '<button class="btn btn-primary btn-slim" onclick="App.enablePush()" '+(ps.busy?'disabled':'')+'>'+(ps.busy?'Turning on…':'Turn on reminders on this phone')+'</button></div>';
+    return h;
+  }
+  var hours = [null,6,7,8,9,10,12,17,18,19,20];
+  h += '<div class="set-row"><span>Morning reminder</span><select style="width:auto;margin:0;min-width:110px" onchange="App.setRemindHour(this.value)">'+
+    hours.map(function(x){ return '<option value="'+(x===null?'':x)+'"'+((me.remind_hour==null?null:me.remind_hour)===x?' selected':'')+'>'+(x===null?'Off':pad(x)+':00')+'</option>'; }).join('')+'</select></div>'+
+    '<div class="set-row"><span>When '+esc(p.name)+' gives me a chore or comments</span><button class="switch'+(me.notify_partner!==false?' on':'')+'" aria-label="Partner alerts" onclick="App.toggleNotifyPartner()"></button></div>'+
+    (ps.msg?'<div class="hint" style="margin:8px 0 0">'+esc(ps.msg)+'</div>':'')+
+    '<div class="btn-row" style="margin:12px 0 0"><button class="btn btn-secondary btn-slim" onclick="App.testPush()">Send a test</button><button class="btn btn-secondary btn-slim" onclick="App.disablePush()">Turn off</button></div></div>';
+  return h;
+}
+function awayCard(){
+  var me = myRecord(), p = partner(), h = '<div class="card"><div class="eyebrow">Away mode</div>';
+  if(me.away_from){
+    h += '<div style="font-size:14px;margin-bottom:12px;line-height:1.5">'+(isAway(me)?'You\'re away':'You\'ll be away')+' from <b>'+esc(niceDate(me.away_from))+'</b>'+(me.away_until?' to <b>'+esc(niceDate(me.away_until))+'</b>':'')+'. '+
+      (me.away_mode==='pause'?'Your chores are paused.':'Your chores go to '+esc(p.name)+'.')+'</div>'+
+      '<button class="btn btn-secondary btn-slim" onclick="App.clearAway()">I\'m back (end away mode)</button></div>';
+    return h;
+  }
+  var a = state.awayDraft || {from:today(), until:addDays(today(),6), mode:'handover'};
+  state.awayDraft = a;
+  h += '<div class="hint" style="margin:0 0 12px">Going away? Hand your chores to '+esc(p.name)+', or pause them until you\'re back. Takes effect on both phones.</div>'+
+    '<div class="row2"><div><label class="lbl">From</label><input type="date" id="awayFrom" value="'+esc(a.from)+'" onchange="state_awayDraft(\'from\',this.value)"></div>'+
+    '<div><label class="lbl">Until</label><input type="date" id="awayUntil" value="'+esc(a.until)+'" onchange="state_awayDraft(\'until\',this.value)"></div></div>'+
+    '<div class="seg"><button class="'+(a.mode==='handover'?'active':'')+'" onclick="App.awayMode(\'handover\')">Hand to '+esc(p.name)+'</button><button class="'+(a.mode==='pause'?'active':'')+'" onclick="App.awayMode(\'pause\')">Pause my chores</button></div>'+
+    '<button class="btn btn-primary btn-slim" onclick="App.setAway()">Set away</button></div>';
+  return h;
+}
+window.state_awayDraft = function(k, v){ state.awayDraft[k] = v; };
+function screenSettings(){
+  var s = state.settings, pend = state.queue.length;
+  var h = '<h1 class="page-title">Settings</h1>';
+  h += awayCard();
+  h += remindersCard();
+  h += '<div class="card"><div class="eyebrow">Appearance</div><div class="seg" style="margin-bottom:0">'+
+    '<button class="'+(s.theme==='light'?'active':'')+'" onclick="App.setTheme(\'light\')">Light</button>'+
+    '<button class="'+(s.theme==='dark'?'active':'')+'" onclick="App.setTheme(\'dark\')">Dark</button></div></div>';
+  h += '<div class="card"><div class="eyebrow">Arrange</div><div class="hint" style="margin:0 0 12px">Put rooms in your order, hide rooms you don\'t need to see, and choose which menus show. Saved on this phone only.</div>'+
+    '<button class="btn btn-secondary btn-slim" onclick="App.go(\'arrange\')">Arrange rooms and menus</button></div>';
+  h += '<div class="card"><div class="eyebrow">Sync</div>'+
+    '<div class="set-row"><span>Status</span><span>'+(state.online?(pend?pend+' change'+(pend===1?'':'s')+' waiting to send':'Up to date'):'Offline')+'</span></div>'+
+    '<div class="set-row"><span>Last synced</span><span>'+(state.lastSync? (localDayOf(state.lastSync)===today()?'Today ':niceDate(localDayOf(state.lastSync))+' ')+timeOf(state.lastSync) : 'Not yet')+'</span></div>'+
+    '<div class="set-row"><span>Photos and reminders function</span><span>'+(state.fnOk===true?'Connected':state.fnOk===false?'Not set up':'Checking…')+'</span></div>'+
+    (state.failedOps?'<div class="notice" style="margin-top:8px">'+state.failedOps+' change(s) were refused by the database and dropped. Check the chore and make the change again.</div>':'')+
+    '<button class="btn btn-secondary btn-slim" style="margin-top:10px" onclick="App.syncNow()">Sync now</button></div>';
+  h += '<div class="card"><div class="eyebrow">About this app</div><div style="font-size:14px;margin-bottom:10px;">Version <b data-testid="version">'+APP_VERSION+'</b></div>'+
+    '<button class="btn btn-secondary btn-slim" onclick="App.refreshApp()">Get the latest version</button>'+
+    '<div class="hint" style="margin:10px 0 0">Your chores are not touched. Anything waiting to send is kept.</div></div>';
+  h += '<div class="card"><div class="eyebrow">Signed in</div><div style="font-size:14px;margin-bottom:12px;">'+esc(state.me.name)+'</div>'+
+    '<button class="btn btn-danger btn-slim" onclick="App.logout()">Log out</button></div>';
+  return h;
+}
+function screenArrange(){
+  var rooms = allRooms(), s = state.settings;
+  var h = '<button class="top-back" onclick="App.go(\'settings\')">'+icon('back',18)+'Settings</button><h1 class="page-title">Arrange</h1>';
+  h += '<div class="card"><div class="eyebrow">Rooms</div><div class="hint" style="margin:0 0 6px">Order is used when you group by room. Hidden rooms drop off your lists but still count in your badge.</div>';
+  rooms.forEach(function(r, i){
+    var off = roomHidden(r);
+    h += '<div class="arr-row'+(off?' off':'')+'"><span class="n">'+esc(r)+'</span>'+
+      '<button class="icon-btn" aria-label="Move '+esc(r)+' up" onclick="App.moveRoom('+i+',-1)" '+(i===0?'disabled':'')+'>'+icon('up',18)+'</button>'+
+      '<button class="icon-btn" aria-label="Move '+esc(r)+' down" onclick="App.moveRoom('+i+',1)" '+(i===rooms.length-1?'disabled':'')+'>'+icon('down',18)+'</button>'+
+      '<button class="switch'+(off?'':' on')+'" aria-label="Show '+esc(r)+'" onclick="App.toggleRoom('+i+')"></button></div>';
+  });
+  h += '</div><div class="card"><div class="eyebrow">Menus</div>'+
+    '<div class="set-row"><span>Fairness menu</span><button class="switch'+(s.showFairness?' on':'')+'" aria-label="Show Fairness" onclick="App.toggleSetting(\'showFairness\')"></button></div>'+
+    '<div class="set-row"><span>Needs your attention card</span><button class="switch'+(s.showAttention?' on':'')+'" aria-label="Show attention card" onclick="App.toggleSetting(\'showAttention\')"></button></div>'+
+    '<div class="hint" style="margin:6px 0 0">The red badge always shows, even with the card hidden.</div></div>';
+  return h;
+}
+
+/* ---------- editor ---------- */
+function screenEdit(){
+  var e = state.edit, me = state.me, p = partner();
+  var isNew = !chore(e.id);
+  var rooms = allRooms();
+  if(rooms.indexOf(e.room)<0) rooms.push(e.room);
+  var unit = {daily:'days',weekly:'weeks',monthly:'months'}[e.repeat_type]||'';
+  var h = '<button class="top-back" onclick="App.cancelEdit()">'+icon('back',18)+'Back</button>'+
+    '<h1 class="page-title">'+(isNew?'New chore':'Edit chore')+'</h1>';
+  h += '<label class="lbl" for="f_title">What needs doing?</label><input type="text" id="f_title" value="'+esc(e.title)+'" placeholder="e.g. Put the bins out" oninput="App.f(\'title\',this.value)">';
+  h += whoseJobSeg(e, 'App.f(\'assigned_to\',', e.rotate);
+  if(e.rotate) h += '<div class="hint">Taking turns: after each time it\'s done, it passes to the other person.</div>';
+  h += '<label class="lbl" for="f_room">Room</label>'+roomSelect('f_room', e.room, 'App.pickRoom(this.value)');
+  h += '<div class="row2"><div><label class="lbl" for="f_due">Due date</label><input type="date" id="f_due" value="'+esc(e.next_due||'')+'" onchange="App.f(\'next_due\',this.value)"></div>'+
+    '<div><label class="lbl" for="f_time">Time (optional)</label><input type="time" id="f_time" value="'+esc(e.due_time||'')+'" onchange="App.f(\'due_time\',this.value)"></div></div>';
+  h += '<label class="lbl">Repeat</label><div class="seg">'+
+    ['none','daily','weekly','monthly'].map(function(t){ return '<button class="'+(e.repeat_type===t?'active':'')+'" onclick="App.f(\'repeat_type\',\''+t+'\',1)">'+{none:'No',daily:'Daily',weekly:'Weekly',monthly:'Monthly'}[t]+'</button>'; }).join('')+'</div>';
+  if(e.repeat_type!=='none'){
+    h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span style="font-size:14px">Every</span>'+
+      '<input type="number" id="f_every" min="1" max="365" value="'+(e.repeat_every||1)+'" style="width:80px;margin:0" oninput="App.f(\'repeat_every\',this.value)">'+
+      '<span style="font-size:14px">'+unit+'</span></div>';
+    h += '<div class="seg"><button class="'+(e.repeat_from==='schedule'?'active':'')+'" onclick="App.f(\'repeat_from\',\'schedule\',1)">On a schedule</button>'+
+      '<button class="'+(e.repeat_from==='after_done'?'active':'')+'" onclick="App.f(\'repeat_from\',\'after_done\',1)">After it\'s done</button></div>';
+    h += '<div class="hint">'+(e.repeat_from==='schedule'?'Comes back on fixed dates, like bins every Tuesday, whenever it was actually done.':'Comes back a set time after it was last done, like cleaning the fridge 4 weeks after the last clean.')+'</div>';
+    h += '<div class="set-row" style="margin-bottom:10px"><span>Take turns<br><span style="font-size:12px;color:var(--neutral-dim)">Swap between '+esc(me.name)+' and '+esc(p.name)+' each time</span></span><button class="switch'+(e.rotate?' on':'')+'" aria-label="Take turns" onclick="App.toggleRotate()"></button></div>';
+  }
+  h += '<label class="lbl">How big a job?</label><div class="seg">'+
+    [1,2,3].map(function(n){ return '<button class="'+(e.effort===n?'active':'')+'" onclick="App.f(\'effort\','+n+',1)">'+['','Small','Medium','Big'][n]+'</button>'; }).join('')+'</div>';
+  h += '<label class="lbl">Checklist</label>';
+  list(e).forEach(function(it, i){
+    h += '<div class="ed-item"><input type="text" value="'+esc(it.text)+'" aria-label="Checklist item '+(i+1)+'" oninput="App.itemText('+i+',this.value)">'+
+      '<button class="icon-btn" aria-label="Remove item" onclick="App.removeItem('+i+')">'+icon('x',16)+'</button></div>';
+  });
+  h += '<div class="btn-row"><button class="btn btn-secondary btn-slim" onclick="App.addEditItem()">'+icon('plus',16)+'Add item</button><button class="btn btn-secondary btn-slim" onclick="App.pasteIntoEditor()">'+icon('paste',16)+'Paste a list</button></div>';
+  h += '<label class="lbl" for="f_notes" style="margin-top:8px">Notes</label><textarea id="f_notes" placeholder="Anything worth knowing" oninput="App.f(\'notes\',this.value)">'+esc(e.notes||'')+'</textarea>';
+  if(state.editError) h += '<div class="err">'+esc(state.editError)+'</div>';
+  h += '<button class="btn btn-primary" onclick="App.saveEdit()">'+(isNew?'Add chore':'Save changes')+'</button>';
+  if(!isNew) h += '<button class="btn btn-danger" style="margin-top:10px" onclick="App.deleteChore(\''+e.id+'\')">Delete chore</button>';
+  return h;
+}
+function whoseJobSeg(e, fnPrefix, noEither){
+  var me = state.me, p = partner();
+  return '<label class="lbl">Whose job?</label><div class="seg">'+
+    '<button class="'+(e.assigned_to===me.id?'active':'')+'" onclick="'+fnPrefix+'\''+me.id+'\',1)">'+esc(me.name)+'</button>'+
+    '<button class="'+(p.id && e.assigned_to===p.id?'active':'')+'" onclick="'+fnPrefix+'\''+(p.id||'')+'\',1)">'+esc(p.name)+'</button>'+
+    (noEither?'':'<button class="'+(!e.assigned_to?'active':'')+'" onclick="'+fnPrefix+'\'\',1)">Either</button>')+'</div>';
+}
+function roomSelect(id, val, onchange){
+  var rooms = allRooms(); if(rooms.indexOf(val)<0) rooms.push(val);
+  return '<select id="'+id+'" onchange="'+onchange+'">'+rooms.map(function(r){ return '<option'+(r===val?' selected':'')+'>'+esc(r)+'</option>'; }).join('')+'<option value="__new">New room…</option></select>';
+}
+
+/* ---------- paste from a note ---------- */
+/* Turns copied note text into clean lines: removes bullets, numbers, checkboxes and blank lines */
+function parseNote(text){
+  return String(text||'').replace(/\r\n?/g,'\n').replace(/[\u2028\u2029]/g,'\n').split('\n').map(function(l){
+    l = l.replace(/[\u200b-\u200f\ufeff\ufffc\u00a0]/g, ' ');
+    for(var k=0;k<3;k++) l = l.replace(/^\s*(?:[-–—*•◦▪▫‣·○●■□☐☑☒✓✔✗✘⬜✅❌➤→>]+|\[\s*[xX✓✔]?\s*\]|\(\s*[xX]?\s*\)|\d{1,3}[.)]|[a-zA-Z][.)](?=\s))\s*/, '');
+    return l.replace(/\s+/g,' ').trim().slice(0,200);
+  }).filter(function(l){ return l && !/^[-–—_=*.~]{2,}$/.test(l); });
+}
+function screenPaste(){
+  var d = state.paste, me = state.me;
+  var lines = parseNote(d.text);
+  var h = '<button class="top-back" onclick="App.cancelPaste()">'+icon('back',18)+'Back</button><h1 class="page-title">Paste from a note</h1>';
+  h += '<div class="hint" style="margin:0 0 10px">In Notes, select the text and tap Copy. For a handwritten note or a photo of a list, press and hold the writing in Photos and tap Copy (iPhone reads handwriting for you). Then paste it below.</div>';
+  h += '<button class="btn btn-secondary btn-slim" style="margin-bottom:10px" onclick="App.pasteClipboard()">'+icon('paste',16)+'Paste from clipboard</button>';
+  h += '<textarea id="pasteText" placeholder="…or press and hold here and tap Paste" style="min-height:120px" oninput="App.pasteText(this.value)">'+esc(d.text)+'</textarea>';
+  if(!lines.length) return h + '<div class="hint">Nothing to add yet.</div>';
+  h += '<label class="lbl">Make it into</label><div class="seg">'+
+    '<button class="'+(d.mode==='separate'?'active':'')+'" onclick="App.pasteSet(\'mode\',\'separate\')">'+lines.length+' separate chore'+(lines.length===1?'':'s')+'</button>'+
+    '<button class="'+(d.mode==='checklist'?'active':'')+'" onclick="App.pasteSet(\'mode\',\'checklist\')">One chore + checklist</button></div>';
+  var items = lines, title = '';
+  if(d.mode==='checklist'){
+    if(d.firstIsTitle && lines.length>1){ title = lines[0]; items = lines.slice(1); }
+    h += '<label class="lbl">Chore name</label><input type="text" id="pasteTitle" value="'+esc(d.title!=null?d.title:title)+'" placeholder="e.g. Weekly food shop" oninput="App.pasteSetQuiet(\'title\',this.value)">';
+    if(lines.length>1) h += '<div class="set-row" style="margin-bottom:8px"><span>Use the first line as the name</span><button class="switch'+(d.firstIsTitle?' on':'')+'" aria-label="First line is the name" onclick="App.pasteFirstLine()"></button></div>';
+  }
+  h += whoseJobSeg(d, 'App.pasteSet(\'assigned_to\',');
+  h += '<div class="row2"><div><label class="lbl">Room</label>'+roomSelect('pasteRoom', d.room, 'App.pasteRoom(this.value)')+'</div>'+
+    '<div><label class="lbl">Due date</label><input type="date" value="'+esc(d.next_due||'')+'" onchange="App.pasteSetQuiet(\'next_due\',this.value)"></div></div>';
+  h += '<label class="lbl">Repeat</label><div class="seg">'+['none','daily','weekly','monthly'].map(function(t){ return '<button class="'+(d.repeat_type===t?'active':'')+'" onclick="App.pasteSet(\'repeat_type\',\''+t+'\')">'+{none:'No',daily:'Daily',weekly:'Weekly',monthly:'Monthly'}[t]+'</button>'; }).join('')+'</div>';
+  var skip = d.skip||{};
+  h += '<div class="card paste-prev"><div class="eyebrow">'+(d.mode==='checklist'?'Checklist items':'Chores to add')+'</div>';
+  items.forEach(function(l, i){
+    var key = (d.mode==='checklist' && d.firstIsTitle && lines.length>1) ? i+1 : i;
+    h += '<div class="ck-row'+(skip[key]?' done':'')+'"><button class="ck-box'+(skip[key]?'':' on')+'" aria-label="Include '+esc(l)+'" onclick="App.pasteSkip('+key+')">'+icon('check',16)+'</button><span class="t">'+esc(l)+'</span></div>';
+  });
+  h += '</div>';
+  var n = items.filter(function(l, i){ var key = (d.mode==='checklist' && d.firstIsTitle && lines.length>1) ? i+1 : i; return !skip[key]; }).length;
+  h += '<button class="btn btn-primary" onclick="App.pasteCreate()">'+(d.mode==='checklist'?'Add chore with '+n+' item'+(n===1?'':'s'):'Add '+n+' chore'+(n===1?'':'s'))+'</button>';
+  return h;
+}
+
+function render(){
+  state.pendingRender = false;
+  var app = document.getElementById('app'), s = state.screen, h = '';
+  document.documentElement.setAttribute('data-theme', state.settings.theme);
+  if(s==='loading'){ app.innerHTML = '<div class="login-wrap">'+brainSVG(80)+'<p style="margin-top:16px">Loading…</p></div>'; return; }
+  if(s==='login' || !state.me){ app.innerHTML = screenLogin(); return; }
+  h += header() + '<div class="main">';
+  if(s==='home') h += screenHome();
+  else if(s==='detail') h += screenDetail();
+  else if(s==='fair') h += screenFair();
+  else if(s==='settings') h += screenSettings();
+  else if(s==='arrange') h += screenArrange();
+  else if(s==='edit') h += screenEdit();
+  else if(s==='paste') h += screenPaste();
+  h += '</div>';
+  if(s==='home') h += '<button class="fab" aria-label="Add a chore" onclick="App.addMenu()">'+icon('plus',26)+'</button>';
+  if(s!=='edit' && s!=='paste') h += nav();
+  app.innerHTML = h;
+}
+
+/* ---------- overlays: action sheet, viewer and toast ---------- */
+function openSheet(html){
+  var o = document.getElementById('overlay');
+  o.innerHTML = '<div class="sheet-back" onclick="if(event.target===this)App.closeSheet()"><div class="sheet" role="dialog">'+html+'</div></div>';
+}
+function closeSheet(){ document.getElementById('overlay').innerHTML = ''; }
+var _toastTimer = null;
+function toast(msg, undoId){
+  var host = document.getElementById('toastHost');
+  host.innerHTML = '<div class="toast" role="status"><span>'+esc(msg)+'</span>'+(undoId?'<button onclick="App.undo(\''+undoId+'\',true)">Undo</button>':'')+'</div>';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ host.innerHTML=''; }, 6000);
+}
+
+/* ---------- settings saved on this phone ---------- */
+async function saveSettings(){
+  try{ await kvSet('settings', state.settings); }catch(e){}
+  try{ localStorage.setItem('bd_theme', state.settings.theme); }catch(e){}
+}
+
+/* ---------- photos and videos ---------- */
+function loadImage(file){
+  return new Promise(function(res, rej){
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function(){ res({img:img, url:url}); };
+    img.onerror = function(){ URL.revokeObjectURL(url); rej(new Error('Could not read the picture')); };
+    img.src = url;
+  });
+}
+function drawScaled(src, w, h, max, quality){
+  var s = Math.min(1, max/Math.max(w, h)), cv = document.createElement('canvas');
+  cv.width = Math.max(1, Math.round(w*s)); cv.height = Math.max(1, Math.round(h*s));
+  cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height);
+  return cv;
+}
+function canvasBlob(cv, q){ return new Promise(function(res){ cv.toBlob(function(b){ res(b); }, 'image/jpeg', q); }); }
+async function preparePhoto(file){
+  try{
+    var r = await loadImage(file);
+    var big = drawScaled(r.img, r.img.naturalWidth, r.img.naturalHeight, PHOTO_MAX_PX);
+    var blob = await canvasBlob(big, 0.82);
+    var thumb = drawScaled(r.img, r.img.naturalWidth, r.img.naturalHeight, 240).toDataURL('image/jpeg', 0.7);
+    URL.revokeObjectURL(r.url);
+    return {blob:blob, mime:'image/jpeg', ext:'jpg', thumb:thumb};
+  }catch(e){
+    var ext = (file.name.split('.').pop()||'jpg').toLowerCase();
+    return {blob:file, mime:file.type||'image/jpeg', ext:ext, thumb:null};
+  }
+}
+function videoThumb(file){
+  return new Promise(function(res){
+    var url = URL.createObjectURL(file), v = document.createElement('video'), done = false;
+    function finish(t){ if(done) return; done = true; URL.revokeObjectURL(url); res(t); }
+    v.muted = true; v.playsInline = true; v.preload = 'metadata'; v.src = url;
+    v.onloadeddata = function(){ try{ v.currentTime = Math.min(0.5, (v.duration||1)/2); }catch(e){ finish(null); } };
+    v.onseeked = function(){ try{ finish(drawScaled(v, v.videoWidth, v.videoHeight, 240).toDataURL('image/jpeg', 0.7)); }catch(e){ finish(null); } };
+    v.onerror = function(){ finish(null); };
+    setTimeout(function(){ finish(null); }, 5000);
+  });
+}
+async function signedUrl(path){
+  var c = state.urlCache[path];
+  if(c && Date.now()-c.at < 50*60000) return c.url;
+  var r = await callFn({action:'view', paths:[path]});
+  var url = r.urls && r.urls[path];
+  if(url) state.urlCache[path] = {url:url, at:Date.now()};
+  return url;
+}
+function closeViewer(){ var v = document.getElementById('viewerHost'); var vid = v.querySelector('video'); if(vid) try{ vid.pause(); }catch(e){} v.innerHTML = ''; if(window._viewerUrl){ URL.revokeObjectURL(window._viewerUrl); window._viewerUrl = null; } }
+
+/* ---------- calendar ---------- */
+function icsText(c){
+  function dt(d){ return d.replace(/-/g,''); }
+  function escI(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n'); }
+  var stamp = nowISO().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  var lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Brain Dump//Chores//EN','CALSCALE:GREGORIAN','BEGIN:VEVENT',
+    'UID:'+c.id+'@brain-dump','DTSTAMP:'+stamp];
+  if(c.due_time){
+    var t = c.due_time.replace(':','')+'00', endH = (parseInt(c.due_time.slice(0,2),10)+1)%24;
+    lines.push('DTSTART:'+dt(c.next_due)+'T'+t, 'DTEND:'+dt(c.next_due)+'T'+pad(endH)+c.due_time.slice(3,5)+'00');
+  } else {
+    lines.push('DTSTART;VALUE=DATE:'+dt(c.next_due), 'DTEND;VALUE=DATE:'+dt(addDays(c.next_due,1)));
+  }
+  if(c.repeat_type!=='none' && c.repeat_from==='schedule') lines.push('RRULE:FREQ='+{daily:'DAILY',weekly:'WEEKLY',monthly:'MONTHLY'}[c.repeat_type]+';INTERVAL='+(c.repeat_every||1));
+  lines.push('SUMMARY:'+escI(c.title), 'DESCRIPTION:'+escI((c.notes?c.notes+'\n':'')+'From Brain Dump'), 'END:VEVENT', 'END:VCALENDAR');
+  return lines.join('\r\n')+'\r\n';
+}
+function downloadBlob(blob, name){
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+
+/* ---------- reminders (push notifications) ---------- */
+function b64ToBytes(s){ s = s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s += '='; var b = atob(s), o = new Uint8Array(b.length); for(var i=0;i<b.length;i++) o[i] = b.charCodeAt(i); return o; }
+async function pushRegistration(){ if(!('serviceWorker' in navigator)) return null; return navigator.serviceWorker.ready; }
+async function refreshPushState(){
+  var ps = state.push;
+  ps.supported = !!('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) && !(isIOS() && !isStandalone());
+  if(!ps.supported) return;
+  try{
+    var reg = await Promise.race([pushRegistration(), new Promise(function(r){ setTimeout(function(){ r(null); }, 3000); })]);
+    var sub = reg && await reg.pushManager.getSubscription();
+    ps.subscribed = !!sub && Notification.permission==='granted';
+  }catch(e){ ps.subscribed = false; }
+}
+
+/* =====================================================================
+   ACTIONS
+   ===================================================================== */
+window.App = {
+  login: async function(){
+    var el = document.getElementById('codeInput'), code = el ? el.value.trim() : '';
+    if(!code){ state.loginError = 'Enter your access code'; render(); return; }
+    if(!window.supabase) await ensureLib();
+    var client = getClient();
+    if(!client){ state.loginError = CONFIGURED ? 'Could not load the database library. Check your connection.' : 'The app is not connected to a database yet.'; render(); return; }
+    state.loginBusy = true; state.loginError = ''; render();
+    try{
+      var res = await client.rpc('login_with_code', {code: code});
+      state.loginBusy = false;
+      if(res.error){ state.loginError = isNetworkError(res.error) ? 'Could not reach the server. Check your connection.' : 'Something went wrong: '+res.error.message; render(); return; }
+      if(!res.data){ state.loginError = 'Code not recognised.'; render(); return; }
+      state.me = {id:res.data.id, name:res.data.name, colour:res.data.colour, code:code};
+      await kvSet('auth', state.me);
+      state.loginError = ''; state.screen = 'home'; state.tab = 'mine'; state.version = null;
+      render();
+      await syncNow(true);
+      refreshPushState().then(safeRender);
+    }catch(e){
+      state.loginBusy = false; state.loginError = 'Could not reach the server. Check your connection.'; render();
+    }
+  },
+  logout: async function(){
+    var pend = (await qAll().catch(function(){ return []; })).length;
+    if(!confirm(pend ? pend+' change(s) have not been sent yet and will be lost. Log out anyway?' : 'Log out? You will need your access code to log back in.')) return;
+    await qClear().catch(function(){}); await mediaClear().catch(function(){});
+    await kvDel('auth').catch(function(){}); await kvDel('cache').catch(function(){});
+    state.me = null; state.people=[]; state.chores=[]; state.completions=[]; state.comments=[]; state.attachments=[]; state.queue=[]; state.version = null;
+    state.screen = 'login'; render();
+  },
+  go: function(s){ state.screen = s; closeSheet(); render(); window.scrollTo(0,0); },
+  setTab: function(t){ state.tab = t; state.screen = 'home'; render(); window.scrollTo(0,0); },
+  setGroup: async function(g){ state.settings.groupBy = g; await saveSettings(); render(); },
+  setRange: function(r){ state.fairRange = r; render(); },
+  toggleHidden: function(){ state.showHidden = !state.showHidden; render(); },
+  syncNow: function(){ syncNow(true); },
+  draft: function(k, v){ state[k] = v; },
+
+  tick: function(id, btn){
+    var c = chore(id); if(!c) return;
+    if(btn) btn.classList.add('on');
+    closeSheet();
+    var cid = uuid();
+    setTimeout(function(){
+      change('complete', {id:cid, chore_id:id, for_due:c.next_due||null, skipped:false, done_at:nowISO(), today:today(), done_by:state.me.id});
+      toast(c.title+' – done', cid);
+    }, btn ? 180 : 0);
+  },
+  skip: function(id){
+    var c = chore(id); if(!c) return;
+    var cid = uuid();
+    change('complete', {id:cid, chore_id:id, for_due:c.next_due||null, skipped:true, done_at:nowISO(), today:today(), done_by:state.me.id});
+    toast(c.title+' – skipped this time', cid);
+  },
+  undo: function(cid, fromToast){
+    if(!fromToast && !confirm('Undo this tick? The chore goes back on the list.')) return;
+    document.getElementById('toastHost').innerHTML = '';
+    change('undo', {id:cid});
+  },
+  snooze: function(id){
+    var c = chore(id); if(!c) return;
+    var copy = JSON.parse(JSON.stringify(c)); copy.next_due = addDays(today(), 1); copy.updated_at = nowISO();
+    change('save', {chore:copy});
+    toast(c.title+' – moved to tomorrow');
+  },
+  assign: function(id, who){
+    var c = chore(id); if(!c) return;
+    who = who || null;
+    if(c.assigned_to===who) return;
+    if(!who && c.rotate){ alert('This chore takes turns, so it needs a person. Switch off Take turns in Edit first.'); return; }
+    var copy = JSON.parse(JSON.stringify(c)); copy.assigned_to = who; copy.updated_at = nowISO();
+    var p = person(who);
+    change('save', {chore:copy, notify: who && who!==state.me.id ? 'assigned' : null});
+    toast(c.title+' – '+(p ? (p.id===state.me.id ? 'now yours' : 'now '+p.name+'\'s') : 'now Either of you'));
+  },
+  openChore: function(id){ state.detailId = id; state.commentDraft = ''; state.itemDraft = ''; state.screen = 'detail'; render(); window.scrollTo(0,0); },
+  closeSheet: closeSheet,
+  addMenu: function(){
+    openSheet('<h3>Add</h3><div class="st-sub">Type a new chore, or turn a note into chores or a checklist.</div>'+
+      '<button class="sheet-opt" onclick="App.newChore()">'+icon('plus',20)+'<div>New chore<span>Fill in the details yourself</span></div></button>'+
+      '<button class="sheet-opt" onclick="App.openPaste()">'+icon('paste',20)+'<div>Paste from a note<span>From Notes, a message, or a photo of a list</span></div></button>'+
+      '<button class="btn btn-secondary btn-slim" onclick="App.closeSheet()">Cancel</button>');
+  },
+  newChore: function(){
+    closeSheet();
+    state.edit = {id:uuid(), title:'', notes:'', room:'Kitchen', assigned_to:state.tab==='partner'?(partner().id||null):state.me.id,
+      repeat_type:'weekly', repeat_every:1, repeat_from:'schedule', next_due:today(), due_time:'', effort:1, finished:false, archived:false, checklist:[], rotate:false};
+    state.editError = ''; state.screen = 'edit'; render(); window.scrollTo(0,0);
+    setTimeout(function(){ var t = document.getElementById('f_title'); if(t) t.focus(); }, 50);
+  },
+  editChore: function(id){
+    closeSheet();
+    var c = chore(id); if(!c) return;
+    state.edit = JSON.parse(JSON.stringify(c)); state.edit.due_time = state.edit.due_time||''; state.edit.checklist = list(state.edit);
+    state.editError = ''; state.screen = 'edit'; render(); window.scrollTo(0,0);
+  },
+  f: function(k, v, rerender){
+    if(k==='effort') v = +v;
+    if(k==='repeat_every') v = Math.max(1, Math.min(365, parseInt(v,10)||1));
+    if(k==='assigned_to') v = v || null;
+    state.edit[k] = v;
+    if(k==='repeat_type' && v==='none') state.edit.rotate = false;
+    if(rerender){ var y = window.scrollY; render(); window.scrollTo(0,y); }
+  },
+  toggleRotate: function(){
+    var e = state.edit; e.rotate = !e.rotate;
+    if(e.rotate && !e.assigned_to) e.assigned_to = state.me.id;
+    var y = window.scrollY; render(); window.scrollTo(0,y);
+  },
+  itemText: function(i, v){ state.edit.checklist[i].text = v; },
+  removeItem: function(i){ state.edit.checklist.splice(i,1); var y = window.scrollY; render(); window.scrollTo(0,y); },
+  addEditItem: function(){
+    state.edit.checklist.push({id:uuid().slice(0,8), text:'', done:false});
+    var y = window.scrollY; render(); window.scrollTo(0,y);
+    var ins = document.querySelectorAll('.ed-item input'); if(ins.length) ins[ins.length-1].focus();
+  },
+  pasteIntoEditor: function(){
+    openSheet('<h3>Paste a list</h3><div class="st-sub">Each line becomes a checklist item. Bullets, numbers and tick-boxes are removed.</div>'+
+      '<textarea id="sheetPaste" style="min-height:140px" placeholder="Press and hold here and tap Paste"></textarea>'+
+      '<button class="btn btn-primary btn-slim" onclick="App.pasteIntoEditorDone()">Add to checklist</button><button class="btn btn-secondary btn-slim" onclick="App.closeSheet()">Cancel</button>');
+    setTimeout(function(){ var t = document.getElementById('sheetPaste'); if(t) t.focus(); }, 50);
+  },
+  pasteIntoEditorDone: function(){
+    var t = document.getElementById('sheetPaste'), lines = parseNote(t ? t.value : '');
+    lines.forEach(function(l){ state.edit.checklist.push({id:uuid().slice(0,8), text:l, done:false}); });
+    closeSheet(); var y = window.scrollY; render(); window.scrollTo(0,y);
+  },
+  pickRoom: function(v){
+    if(v==='__new'){
+      var n = prompt('Name of the new room');
+      n = n ? n.trim().slice(0,30) : '';
+      if(n) state.edit.room = n;
+    } else state.edit.room = v;
+    var y = window.scrollY; render(); window.scrollTo(0,y);
+  },
+  cancelEdit: function(){ var back = state.edit && chore(state.edit.id) ? 'detail' : 'home'; state.edit = null; state.screen = back; render(); },
+  saveEdit: function(){
+    var e = state.edit;
+    var t = document.getElementById('f_title'); if(t) e.title = t.value;
+    var n = document.getElementById('f_notes'); if(n) e.notes = n.value;
+    e.title = (e.title||'').trim();
+    if(!e.title){ state.editError = 'Give the chore a name.'; render(); return; }
+    e.checklist = list(e).map(function(it){ return Object.assign({}, it, {text:(it.text||'').trim()}); }).filter(function(it){ return it.text; });
+    if(e.repeat_type!=='none' && !e.next_due) e.next_due = today();
+    if(e.rotate && !e.assigned_to) e.assigned_to = state.me.id;
+    var existing = chore(e.id);
+    if(existing && existing.finished && e.next_due) e.finished = false; /* editing a finished one-off brings it back */
+    e.updated_at = nowISO();
+    var copy = JSON.parse(JSON.stringify(e)); if(!copy.due_time) copy.due_time = null; if(!copy.next_due) copy.next_due = null;
+    var notify = copy.assigned_to && copy.assigned_to!==state.me.id && (!existing || existing.assigned_to!==copy.assigned_to) ? 'assigned' : null;
+    state.edit = null;
+    state.screen = existing ? 'detail' : 'home'; state.detailId = copy.id;
+    change('save', {chore:copy, notify:notify});
+    toast(existing ? 'Saved' : 'Added '+copy.title);
+  },
+  deleteChore: function(id){
+    var c = chore(id); if(!c) return;
+    if(!confirm('Delete "'+c.title+'"? It disappears from both phones.')) return;
+    closeSheet();
+    var copy = JSON.parse(JSON.stringify(c)); copy.archived = true; copy.updated_at = nowISO();
+    state.edit = null; state.screen = 'home';
+    change('save', {chore:copy});
+    toast('Deleted '+c.title);
+  },
+
+  /* checklist */
+  toggleItem: function(cid, itemId){
+    var c = chore(cid); if(!c) return;
+    var it = list(c).filter(function(x){ return x.id===itemId; })[0]; if(!it) return;
+    change('toggle', {chore_id:cid, item_id:itemId, done:!it.done, at:nowISO(), by:state.me.id});
+    var all = list(chore(cid)), left = all.filter(function(x){ return !x.done; }).length;
+    if(!it.done && all.length && left===0 && !c.finished){
+      setTimeout(function(){ if(confirm('Everything on the checklist is ticked. Mark "'+c.title+'" done?')) App.tick(cid); }, 250);
+    }
+  },
+  addItem: function(cid){
+    var inp = document.getElementById('itemInput'), text = (inp ? inp.value : state.itemDraft).trim();
+    if(!text) return;
+    var c = chore(cid); if(!c) return;
+    var lines = parseNote(text); if(!lines.length) return;
+    var copy = JSON.parse(JSON.stringify(c));
+    copy.checklist = list(copy).concat(lines.map(function(l){ return {id:uuid().slice(0,8), text:l, done:false}; }));
+    copy.updated_at = nowISO();
+    state.itemDraft = '';
+    change('save', {chore:copy});
+    setTimeout(function(){ var i = document.getElementById('itemInput'); if(i) i.focus(); }, 50);
+  },
+  pasteIntoChecklist: function(cid){
+    openSheet('<h3>Paste a list</h3><div class="st-sub">Each line becomes a checklist item. Bullets, numbers and tick-boxes are removed.</div>'+
+      '<textarea id="sheetPaste" style="min-height:140px" placeholder="Press and hold here and tap Paste"></textarea>'+
+      '<button class="btn btn-primary btn-slim" onclick="App.pasteIntoChecklistDone(\''+cid+'\')">Add to checklist</button><button class="btn btn-secondary btn-slim" onclick="App.closeSheet()">Cancel</button>');
+    setTimeout(function(){ var t = document.getElementById('sheetPaste'); if(t) t.focus(); }, 50);
+  },
+  pasteIntoChecklistDone: function(cid){
+    var t = document.getElementById('sheetPaste'), lines = parseNote(t ? t.value : ''), c = chore(cid);
+    closeSheet();
+    if(!lines.length || !c) return;
+    var copy = JSON.parse(JSON.stringify(c));
+    copy.checklist = list(copy).concat(lines.map(function(l){ return {id:uuid().slice(0,8), text:l, done:false}; }));
+    copy.updated_at = nowISO();
+    change('save', {chore:copy});
+    toast('Added '+lines.length+' item'+(lines.length===1?'':'s'));
+  },
+
+  /* paste from a note */
+  openPaste: function(){
+    closeSheet();
+    state.paste = {text:'', mode:'separate', firstIsTitle:true, title:null, assigned_to:state.me.id, room:'Other', next_due:today(), repeat_type:'none', skip:{}};
+    state.screen = 'paste'; render(); window.scrollTo(0,0);
+  },
+  pasteClipboard: async function(){
+    try{
+      var t = await navigator.clipboard.readText();
+      if(!t){ toast('The clipboard is empty. Copy the note first.'); return; }
+      state.paste.text = t; state.paste.skip = {}; state.paste.title = null;
+      state.paste.mode = parseNote(t).length > 1 ? state.paste.mode : 'separate';
+      render();
+    }catch(e){ toast('Press and hold in the box and tap Paste instead.'); var b = document.getElementById('pasteText'); if(b) b.focus(); }
+  },
+  pasteText: function(v){
+    var before = parseNote(state.paste.text).length;
+    state.paste.text = v;
+    if(parseNote(v).length !== before){ state.paste.skip = {}; var el = document.getElementById('pasteText'), pos = el ? el.selectionStart : 0; render(); var n = document.getElementById('pasteText'); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(e){} } }
+  },
+  pasteSet: function(k, v){ state.paste[k] = (k==='assigned_to' ? (v||null) : v); var y = window.scrollY; render(); window.scrollTo(0,y); },
+  pasteSetQuiet: function(k, v){ state.paste[k] = v; },
+  pasteFirstLine: function(){ state.paste.firstIsTitle = !state.paste.firstIsTitle; state.paste.title = null; state.paste.skip = {}; var y = window.scrollY; render(); window.scrollTo(0,y); },
+  pasteSkip: function(i){ state.paste.skip[i] = !state.paste.skip[i]; var y = window.scrollY; render(); window.scrollTo(0,y); },
+  pasteRoom: function(v){
+    if(v==='__new'){ var n = prompt('Name of the new room'); n = n ? n.trim().slice(0,30) : ''; if(n) state.paste.room = n; }
+    else state.paste.room = v;
+    var y = window.scrollY; render(); window.scrollTo(0,y);
+  },
+  cancelPaste: function(){ state.paste = null; state.screen = 'home'; render(); },
+  pasteCreate: function(){
+    var d = state.paste, lines = parseNote(d.text), skip = d.skip||{};
+    var base = {notes:'', room:d.room||'Other', assigned_to:d.assigned_to||null, repeat_type:d.repeat_type, repeat_every:1, repeat_from:'schedule',
+      next_due:d.next_due||null, due_time:null, effort:1, finished:false, archived:false, rotate:false};
+    if(d.repeat_type!=='none' && !base.next_due) base.next_due = today();
+    var made = 0, firstId = null, notifyAny = base.assigned_to && base.assigned_to!==state.me.id;
+    if(d.mode==='checklist'){
+      var useFirst = d.firstIsTitle && lines.length>1;
+      var titleEl = document.getElementById('pasteTitle');
+      var title = ((titleEl ? titleEl.value : d.title) || (useFirst ? lines[0] : '') || 'Checklist').trim();
+      var items = lines.map(function(l, i){ return {l:l, i:i}; }).filter(function(x){ return !(useFirst && x.i===0) && !skip[x.i]; });
+      var c = Object.assign({}, base, {id:uuid(), title:title.slice(0,200), checklist:items.map(function(x){ return {id:uuid().slice(0,8), text:x.l, done:false}; }), updated_at:nowISO()});
+      change('save', {chore:c, notify:notifyAny?'assigned':null}); made = 1; firstId = c.id;
+    } else {
+      lines.forEach(function(l, i){
+        if(skip[i]) return;
+        var c = Object.assign({}, base, {id:uuid(), title:l, checklist:[], updated_at:nowISO()});
+        change('save', {chore:c, notify:(notifyAny && made===0)?'assigned':null}); made++;
+      });
+    }
+    state.paste = null; state.screen = 'home'; render();
+    toast(d.mode==='checklist' ? 'Added a chore with a checklist' : 'Added '+made+' chore'+(made===1?'':'s'));
+  },
+
+  /* comments */
+  sendComment: function(cid){
+    var t = document.getElementById('commentInput'), body = (t ? t.value : state.commentDraft).trim();
+    if(!body) return;
+    state.commentDraft = '';
+    if(t) t.blur();
+    change('comment', {id:uuid(), chore_id:cid, body:body.slice(0,2000), at:nowISO(), by:state.me.id});
+  },
+  deleteComment: function(id){ if(!confirm('Delete this comment?')) return; change('del_comment', {id:id}); },
+
+  /* photos and videos */
+  addMedia: async function(cid, input){
+    var files = Array.prototype.slice.call(input.files||[]);
+    input.value = '';
+    for(var i=0;i<files.length;i++){
+      var f = files[i], isVideo = /^video\//.test(f.type) || /\.(mov|mp4|m4v|3gp)$/i.test(f.name);
+      if(isVideo && f.size > MAX_VIDEO_MB*1024*1024){ alert('"'+f.name+'" is '+Math.round(f.size/1048576)+' MB. Videos can be up to '+MAX_VIDEO_MB+' MB (about a minute or two). Try a shorter clip.'); continue; }
+      toast('Preparing '+(isVideo?'video':'photo')+'…');
+      var prep = isVideo ? {blob:f, mime:f.type||'video/mp4', ext:(f.name.split('.').pop()||'mp4').toLowerCase(), thumb:await videoThumb(f)} : await preparePhoto(f);
+      var id = uuid();
+      try{ await mediaPut({id:id, blob:prep.blob, mime:prep.mime}); }
+      catch(e){ alert('Could not keep the file on this phone. It may be too big for the space left.'); continue; }
+      await change('upload', {id:id, chore_id:cid, kind:isVideo?'video':'photo', mime:prep.mime, ext:prep.ext, size:prep.blob.size, thumb:prep.thumb, by:state.me.id, at:nowISO()});
+    }
+    document.getElementById('toastHost').innerHTML = '';
+  },
+  viewMedia: async function(id){
+    var m = state.attachments.filter(function(x){ return x.id===id; })[0]; if(!m) return;
+    var host = document.getElementById('viewerHost'), by = person(m.created_by);
+    host.innerHTML = '<div class="viewer" role="dialog"><div class="vbar"><button class="vbtn" onclick="App.closeViewer()">Close</button>'+
+      '<span style="font-size:12px;opacity:.8">'+esc(by?by.name:'')+' · '+esc(whenLabel(m.created_at))+'</span></div>'+
+      '<div class="stage" id="viewerStage">Loading…</div>'+
+      '<div class="vbar bot"><button class="vbtn" id="viewerSave" onclick="App.saveMedia(\''+id+'\')">Save to phone</button><button class="vbtn danger" onclick="App.deleteMedia(\''+id+'\')">Delete</button></div></div>';
+    var url = null;
+    try{
+      if(m._pending){ var local = await mediaGet(id); if(local){ url = URL.createObjectURL(local.blob); window._viewerUrl = url; } }
+      else if(m.path) url = await signedUrl(m.path);
+    }catch(e){}
+    var stage = document.getElementById('viewerStage'); if(!stage) return;
+    if(!url){ stage.innerHTML = state.thumbs[id] ? '<img src="'+esc(state.thumbs[id])+'" alt=""><div style="position:absolute;bottom:90px;font-size:12px">Full size needs signal</div>' : 'Needs signal to load'; return; }
+    stage.innerHTML = m.kind==='video' ? '<video src="'+esc(url)+'" controls playsinline autoplay></video>' : '<img src="'+esc(url)+'" alt="">';
+  },
+  closeViewer: closeViewer,
+  saveMedia: async function(id){
+    var m = state.attachments.filter(function(x){ return x.id===id; })[0]; if(!m) return;
+    var btn = document.getElementById('viewerSave'); if(btn) btn.textContent = 'Getting file…';
+    try{
+      var blob;
+      if(m._pending){ var local = await mediaGet(id); blob = local && local.blob; }
+      else { var url = await signedUrl(m.path); blob = await (await fetch(url)).blob(); }
+      if(!blob) throw new Error('none');
+      var ext = (m.path||'').split('.').pop() || (m.kind==='video'?'mp4':'jpg');
+      var name = 'brain-dump-'+(m.kind==='video'?'video':'photo')+'-'+today()+'.'+ext, file = null;
+      try{ file = new File([blob], name, {type:m.mime||blob.type}); }catch(e){}
+      if(file && navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); }
+      else downloadBlob(blob, name);
+    }catch(e){ if(!e || e.name!=='AbortError') alert('Could not get the file. Check your signal and try again.'); }
+    if(btn) btn.textContent = 'Save to phone';
+  },
+  deleteMedia: function(id){
+    if(!confirm('Delete this from both phones?')) return;
+    closeViewer();
+    change('del_attachment', {id:id});
+  },
+
+  addToCalendar: async function(id){
+    var c = chore(id); if(!c || !c.next_due) return;
+    var blob = new Blob([icsText(c)], {type:'text/calendar'}), name = c.title.replace(/[^\w\- ]+/g,'').slice(0,40)+'.ics';
+    var file = null; try{ file = new File([blob], name, {type:'text/calendar'}); }catch(e){}
+    if(file && navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file], title:c.title}); return; }catch(e){ if(e && e.name==='AbortError') return; }
+    }
+    downloadBlob(blob, name);
+  },
+
+  /* away mode */
+  awayMode: function(m){ state.awayDraft.mode = m; render(); },
+  setAway: function(){
+    var a = state.awayDraft, f = document.getElementById('awayFrom'), u = document.getElementById('awayUntil');
+    if(f) a.from = f.value; if(u) a.until = u.value;
+    if(!a.from){ alert('Choose the first day you\'re away.'); return; }
+    if(a.until && a.until < a.from){ alert('The end date is before the start date.'); return; }
+    change('away', {from:a.from, until:a.until||null, mode:a.mode});
+    toast('Away mode set');
+  },
+  clearAway: function(){ state.awayDraft = null; change('away', {from:null, until:null, mode:null}); toast('Welcome back'); },
+
+  /* reminders */
+  enablePush: async function(){
+    var ps = state.push; ps.busy = true; ps.msg = ''; render();
+    try{
+      if(!state.vapidKey){ var r = await callFn({action:'ping'}); state.vapidKey = r.vapidPublicKey; state.fnOk = true; }
+      var perm = await Notification.requestPermission();
+      if(perm!=='granted') throw new Error('Notifications were not allowed. You can allow them in iPhone Settings > Notifications > Brain Dump.');
+      var reg = await pushRegistration();
+      var sub = await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64ToBytes(state.vapidKey)});
+      var client = getClient();
+      var res = await client.rpc('save_push_sub', {p_code:state.me.code, p_sub:JSON.parse(JSON.stringify(sub)), p_app_url:location.href.split('#')[0].split('?')[0]});
+      if(res.error) throw res.error;
+      var me = myRecord();
+      if(me.remind_hour==null) await change('reminders', {hour:8, notify:me.notify_partner!==false});
+      ps.subscribed = true; ps.msg = 'Reminders are on. Try "Send a test".';
+    }catch(e){ ps.msg = e && e.network ? 'No signal. Try again when you\'re online.' : String((e && e.message) || e); }
+    ps.busy = false; render();
+  },
+  disablePush: async function(){
+    try{
+      var reg = await pushRegistration(), sub = reg && await reg.pushManager.getSubscription();
+      if(sub){ var client = getClient(); if(client) await client.rpc('delete_push_sub', {p_code:state.me.code, p_endpoint:sub.endpoint}); await sub.unsubscribe(); }
+    }catch(e){}
+    state.push.subscribed = false; state.push.msg = ''; render();
+  },
+  testPush: async function(){
+    state.push.msg = 'Sending…'; render();
+    try{ var r = await callFn({action:'test'}); state.push.msg = (r.results||[]).some(function(x){ return x===201 || x===200; }) ? 'Sent. It should appear in a few seconds.' : 'Nothing was sent. Try turning reminders off and on again.'; }
+    catch(e){ state.push.msg = e.network ? 'No signal.' : 'Could not send: '+e.message; }
+    render();
+  },
+  setRemindHour: function(v){ var me = myRecord(); change('reminders', {hour:v===''?null:parseInt(v,10), notify:me.notify_partner!==false}); },
+  toggleNotifyPartner: function(){ var me = myRecord(); change('reminders', {hour:me.remind_hour==null?null:me.remind_hour, notify:me.notify_partner===false}); },
+
+  shareSummary: function(){
+    var text = summaryText(), title = 'Brain Dump summary';
+    if(navigator.share){
+      navigator.share({title:title, text:text}).catch(function(e){ if(!e || e.name!=='AbortError') App.shareFallback(); });
+    } else App.shareFallback();
+  },
+  shareFallback: function(){
+    var text = summaryText();
+    openSheet('<h3>Share summary</h3><div class="st-sub">Sharing from here is not available on this device, so copy it or save it instead.</div>'+
+      '<pre class="share-text">'+esc(text)+'</pre>'+
+      '<button class="btn btn-primary btn-slim" onclick="App.copySummary()">Copy</button>'+
+      '<button class="btn btn-secondary btn-slim" onclick="App.saveSummary()">Save to this phone</button>'+
+      '<button class="btn btn-secondary btn-slim" onclick="App.closeSheet()">Close</button>');
+  },
+  copySummary: function(){
+    var text = summaryText();
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function(){ closeSheet(); toast('Copied'); }).catch(function(){ toast('Could not copy. Use Save instead.'); });
+  },
+  saveSummary: function(){ downloadBlob(new Blob([summaryText()], {type:'text/plain'}), 'brain-dump-summary-'+today()+'.txt'); closeSheet(); },
+
+  setTheme: async function(t){ state.settings.theme = t; await saveSettings(); try{ document.querySelector('meta[name="theme-color"]').setAttribute('content', t==='light'?'#F2F1F8':'#1C1F3A'); }catch(e){} render(); },
+  moveRoom: async function(i, dir){
+    var o = allRooms(), j = i+dir;
+    if(j<0 || j>=o.length) return;
+    var tmp = o[i]; o[i] = o[j]; o[j] = tmp;
+    state.settings.roomOrder = o; await saveSettings(); render();
+  },
+  toggleRoom: async function(i){
+    var r = allRooms()[i], h = state.settings.hiddenRooms = state.settings.hiddenRooms||[];
+    var k = h.indexOf(r); if(k>=0) h.splice(k,1); else h.push(r);
+    await saveSettings(); render();
+  },
+  toggleSetting: async function(k){ state.settings[k] = !state.settings[k]; await saveSettings(); render(); },
+  refreshApp: async function(){
+    try{
+      if('serviceWorker' in navigator){ var regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(function(r){ return r.unregister(); })); }
+      if(window.caches){ var keys = await caches.keys(); await Promise.all(keys.filter(function(k){ return k.indexOf('braindump-')===0; }).map(function(k){ return caches.delete(k); })); }
+    }catch(e){}
+    location.reload();
+  }
+};
+
+/* ---------- start-up ---------- */
+(async function boot(){
+  render();
+  try{ var s = await kvGet('settings'); if(s) for(var k in s) state.settings[k] = s[k]; }catch(e){}
+  try{ state.me = await kvGet('auth'); }catch(e){}
+  if(state.me){
+    try{
+      var cache = await kvGet('cache');
+      if(cache){ state.people = cache.people||[]; state.chores = cache.chores||[]; state.completions = cache.completions||[];
+        state.comments = cache.comments||[]; state.attachments = cache.attachments||[]; state.lastSync = cache.lastSync||null; state.version = cache.version==null?null:cache.version; }
+      state.thumbs = (await kvGet('thumbs')) || {};
+      state.vapidKey = await kvGet('vapid');
+    }catch(e){}
+    if(!state.people.length) state.people = [{id:state.me.id, name:state.me.name, colour:state.me.colour}];
+    state.queue = await qAll().catch(function(){ return []; });
+    state.screen = 'home';
+    /* opened from a notification about a chore */
+    var m = location.hash.match(/chore=([0-9a-f-]{36})/); if(m && chore(m[1])){ state.detailId = m[1]; state.screen = 'detail'; }
+  } else state.screen = 'login';
+  render();
+  if(state.me){ syncNow(true); refreshPushState().then(safeRender); }
+
+  window.addEventListener('online', function(){ state.online = true; syncNow(); });
+  window.addEventListener('offline', function(){ state.online = false; safeRender(); });
+  document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible'){ syncNow(); } });
+  setInterval(function(){ if(document.visibilityState==='visible') syncNow(); }, SYNC_EVERY_MS);
+  /* redraw once a minute so "Today", "Overdue" and late times stay right */
+  setInterval(function(){ if(state.me) safeRender(); }, 60000);
+
+  if('serviceWorker' in navigator && !window.__NO_SW){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
+})();
+
+})();
+</script>
+</body>
+</html>
