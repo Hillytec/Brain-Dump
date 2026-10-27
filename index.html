@@ -112,6 +112,17 @@ input[type=date],input[type=time]{min-width:0;max-width:100%;display:block;}
 .who.sm{width:22px;height:22px;font-size:10px;}
 .who.either{background:transparent;border:1.5px dashed var(--neutral-dim);color:var(--neutral-dim);font-size:10px;width:auto;padding:0 7px;border-radius:999px;}
 .effort{letter-spacing:1px;color:var(--pink);}
+.who.both{background:transparent;border:1.5px solid var(--warn);color:var(--warn);font-size:10px;width:auto;padding:0 7px;border-radius:999px;}
+.chore-title.both,.att-row .t.both{color:var(--warn);}
+.balloon{flex:none;display:inline-flex;align-items:center;}
+.chore.prio{border-color:rgba(229,72,77,.55);box-shadow:inset 0 0 0 1px rgba(229,72,77,.25);}
+.group-h.prio{color:#E5484D;}
+.chips{display:flex;gap:6px;overflow-x:auto;margin:0 0 10px;padding-bottom:2px;}
+.chips button{flex:none;border:1px solid var(--line);background:transparent;color:var(--neutral-dim);font:600 13px Inter,sans-serif;padding:7px 12px;border-radius:999px;cursor:pointer;}
+.chips button.active{background:var(--secondary-lighter);color:var(--neutral);border-color:var(--neutral-dim);}
+.chips button.both.active{color:var(--warn);border-color:var(--warn);}
+.btn-prio{background:transparent;border:1.5px solid #E5484D;color:#E5484D;}
+.btn-prio.on{background:rgba(229,72,77,.12);}
 .att-card{border-left:4px solid #D62828;}
 .att-sum{font-size:14px;font-weight:600;margin-bottom:6px;}
 .att-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);}
@@ -230,7 +241,7 @@ pre.share-text{white-space:pre-wrap;font:13px/1.45 Inter,sans-serif;background:v
    ===================================================================== */
 var SUPABASE_URL = 'https://hlmrxflsgkienvcvaxhe.supabase.co';
 var SUPABASE_ANON_KEY = 'sb_publishable_1-KKc8z1S5azfq0Zkr3lnA_ObB0lMkS';
-var APP_VERSION = 'v2 - 21 Oct 2026';
+var APP_VERSION = 'v3 - 27 Oct 2026';
 
 var CONFIGURED = /^https:\/\//.test(SUPABASE_URL) && SUPABASE_ANON_KEY.indexOf('PASTE') !== 0;
 var FUNCTION_URL = SUPABASE_URL.replace(/\/$/, '') + '/functions/v1/brain-dump';
@@ -433,8 +444,14 @@ function isLate(c){
   if(c.next_due===t && c.due_time){ var n = nowDate(); return c.due_time < pad(n.getHours())+':'+pad(n.getMinutes()); }
   return false;
 }
-function waitingForMe(){ var t = today(); return activeChores().filter(function(c){ return isMine(c) && !isPaused(c) && c.next_due && c.next_due <= t; }).sort(byDue); }
+/* "Both of us": a job you do together (shows on both lists, counts for both in Fairness) */
+function isBoth(c){ return !c.assigned_to && !!c.together; }
+/* red balloon: this chore is a top priority today (ends by itself tomorrow, or when done) */
+function isPriority(c){ return !!c.priority_on && c.priority_on===today() && !c.finished && !c.archived; }
+function waitingForMe(){ var t = today(); return activeChores().filter(function(c){ return isMine(c) && !isPaused(c) && ((c.next_due && c.next_due <= t) || isPriority(c)); }).sort(byDue); }
 function byDue(a,b){
+  var pa = isPriority(a)?0:1, pb = isPriority(b)?0:1;
+  if(pa!==pb) return pa-pb;
   var da = a.next_due||'9999', dbb = b.next_due||'9999';
   if(da!==dbb) return da<dbb?-1:1;
   var ta = a.due_time||'99', tb = b.due_time||'99';
@@ -511,6 +528,15 @@ function brainSVG(size){
   '</svg>';
 }
 
+function balloonSVG(size){
+  return '<svg class="balloon-svg" width="'+size+'" height="'+Math.round(size*1.45)+'" viewBox="0 0 20 29" aria-label="Top priority today" role="img">'+
+    '<ellipse cx="10" cy="9" rx="7.6" ry="8.6" fill="#E5272F"/>'+
+    '<ellipse cx="7.3" cy="5.6" rx="2" ry="2.8" fill="#FF8A8F" opacity=".8" transform="rotate(-20 7.3 5.6)"/>'+
+    '<path d="M8.6 17.4h2.8l-1.4 2.1z" fill="#B71C22"/>'+
+    '<path d="M10 19.5c-2 2 2 3.2 0 5.1s1.8 2.6.6 3.9" stroke="#9A98B5" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg>';
+}
+function balloon(){ return '<span class="balloon" title="Top priority today">'+balloonSVG(16)+'</span>'; }
+
 /* =====================================================================
    LOCAL CHANGES. Each change is applied to the phone straight away,
    saved on the phone, then queued to send to Supabase.
@@ -535,7 +561,9 @@ function applyComplete(a){
   var c = chore(a.chore_id);
   state.completions.unshift({id:a.id, chore_id:a.chore_id, done_by:a.done_by, done_at:a.done_at,
     for_due_date:a.for_due||null, skipped:!!a.skipped, chore_title:c?c.title:'', effort:c?c.effort:1,
-    _prev_assigned:c?c.assigned_to:null, _prev_checklist:c?JSON.parse(JSON.stringify(list(c))):null});
+    _prev_assigned:c?c.assigned_to:null, _prev_checklist:c?JSON.parse(JSON.stringify(list(c))):null,
+    together:!!(c && isBoth(c)), _prev_priority:c?c.priority_on||null:null});
+  if(c && c.priority_on) c.priority_on = null;
   if(c && !a.skipped){ c.last_done_at = a.done_at; c.last_done_by = a.done_by; }
   if(c && sameDue(c.next_due, a.for_due) && !c.finished){
     if(c.repeat_type==='none') c.finished = true;
@@ -561,6 +589,7 @@ function applyUndo(a){
     c.next_due = x.for_due_date; c.finished = false; c.updated_at = nowISO();
     if(x._prev_assigned !== undefined) c.assigned_to = x._prev_assigned;
     if(x._prev_checklist) c.checklist = x._prev_checklist;
+    if(x._prev_priority) c.priority_on = x._prev_priority;
   }
 }
 function applyToggle(a){
@@ -753,7 +782,7 @@ function header(){
 function nav(){
   var n = waitingForMe().length, s = state.screen;
   var h = '<div class="bottom-nav">';
-  h += '<button class="'+(s==='home'||s==='detail'?'active':'')+'" onclick="App.go(\'home\')">'+icon('list',22)+'<span>Chores</span>'+(n?'<span class="nav-dot" data-testid="nav-badge">'+n+'</span>':'')+'</button>';
+  h += '<button class="'+(s==='home'||s==='detail'||s==='waiting'?'active':'')+'" onclick="App.go(\'home\')">'+icon('list',22)+'<span>Chores</span>'+(n?'<span class="nav-dot" data-testid="nav-badge">'+n+'</span>':'')+'</button>';
   if(state.settings.showFairness) h += '<button class="'+(s==='fair'?'active':'')+'" onclick="App.go(\'fair\')">'+icon('scale',22)+'<span>Fairness</span></button>';
   h += '<button class="'+(s==='settings'||s==='arrange'?'active':'')+'" onclick="App.go(\'settings\')">'+icon('gear',22)+'<span>Settings</span></button>';
   return h + '</div>';
@@ -771,7 +800,8 @@ function screenLogin(){
 function choreRow(c, tab){
   var late = isLate(c), paused = isPaused(c);
   var who = '';
-  if(!c.assigned_to) who = '<span class="who either">Either</span>';
+  if(isBoth(c)) who = '<span class="who both">Both</span>';
+  else if(!c.assigned_to) who = '<span class="who either">Either</span>';
   else if(isCovering(c)) who = whoChip(person(c.assigned_to));
   var items = list(c), done = items.filter(function(i){ return i.done; }).length;
   var nC = commentsFor(c.id).length, nM = mediaFor(c.id).length;
@@ -782,18 +812,20 @@ function choreRow(c, tab){
   if(nC) sub += '<span class="meta">'+icon('chat',13)+nC+'</span>';
   if(c.last_done_at) sub += '<span>Last done '+esc(agoLabel(c.last_done_at))+(lastBy?' · '+esc(lastBy.name):'')+'</span>';
   if(isCovering(c)) sub += '<span>Covering for '+esc(person(c.assigned_to).name)+'</span>';
-  return '<div class="chore'+(late?' late':'')+(paused?' paused':'')+'" data-chore="'+esc(c.title)+'">'+
+  var prio = isPriority(c);
+  return '<div class="chore'+(late?' late':'')+(paused?' paused':'')+(prio?' prio':'')+'" data-chore="'+esc(c.title)+'">'+
     '<button class="tick" aria-label="Mark '+esc(c.title)+' done" onclick="App.tick(\''+c.id+'\',this)">'+icon('check',18)+'</button>'+
     '<div class="chore-main" onclick="App.openChore(\''+c.id+'\')">'+
-      '<div class="chore-title">'+esc(c.title)+'</div><div class="chore-sub">'+sub+'</div>'+
-    '</div>'+who+'</div>';
+      '<div class="chore-title'+(isBoth(c)?' both':'')+'">'+esc(c.title)+'</div><div class="chore-sub">'+sub+'</div>'+
+    '</div>'+(prio?balloon():'')+who+'</div>';
 }
 function groupByDate(list_){
   var t = today(), tm = addDays(t,1), wk = addDays(t,6);
-  var g = [['Overdue',[]],['Today',[]],['Tomorrow',[]],['This week',[]],['Later',[]],['No date',[]],['Paused while away',[]]];
+  var g = [['Overdue',[]],['Today',[]],['Tomorrow',[]],['This week',[]],['Later',[]],['No date',[]],['Paused while away',[]],['Top priority today',[]]];
   list_.forEach(function(c){
     var d = c.next_due;
     if(isPaused(c)) g[6][1].push(c);
+    else if(isPriority(c)) g[7][1].push(c);
     else if(!d) g[5][1].push(c);
     else if(d < t) g[0][1].push(c);
     else if(d===t) g[1][1].push(c);
@@ -801,6 +833,7 @@ function groupByDate(list_){
     else if(d<=wk) g[3][1].push(c);
     else g[4][1].push(c);
   });
+  g.unshift(g.pop());
   return g.filter(function(x){ return x[1].length; });
 }
 function groupByRoom(list_){
@@ -823,9 +856,9 @@ function screenHome(){
       '<div class="att-sum">'+waiting.length+' chore'+(waiting.length===1?'':'s')+' waiting for you'+(od?' · '+od+' overdue':'')+'</div>';
     waiting.slice(0,3).forEach(function(c){
       h += '<div class="att-row"><button class="tick" aria-label="Mark '+esc(c.title)+' done" onclick="App.tick(\''+c.id+'\',this)">'+icon('check',18)+'</button>'+
-        '<div class="t" onclick="App.openChore(\''+c.id+'\')">'+esc(c.title)+'<span>'+esc(dueLabel(c))+'</span></div></div>';
+        '<div class="t'+(isBoth(c)?' both':'')+'" onclick="App.openChore(\''+c.id+'\')">'+esc(c.title)+'<span>'+esc(isPriority(c)?'Top priority today · '+dueLabel(c):dueLabel(c))+'</span></div>'+(isPriority(c)?balloon():'')+'</div>';
     });
-    if(waiting.length>3) h += '<button class="linkish" onclick="App.setTab(\'mine\')">See all '+waiting.length+' in Mine</button>';
+    if(waiting.length>3) h += '<button class="linkish" onclick="App.go(\'waiting\')">See all '+waiting.length+' waiting for you</button>';
     h += '</div>';
   }
   h += '<div class="tabs">'+
@@ -834,7 +867,16 @@ function screenHome(){
     '<button class="'+(tab==='done'?'active':'')+'" onclick="App.setTab(\'done\')">Done</button></div>';
   if(tab==='done') return h + doneList();
 
-  var lst = (tab==='mine' ? mine : theirs).slice().sort(byDue);
+  var f = state.settings.listFilter || 'all', ownId = tab==='mine' ? state.me.id : p.id;
+  h += '<div class="chips" role="group" aria-label="Show">'+
+    [['all','All'],['own', tab==='mine'?'Just mine':'Just '+p.name],['both','Both'],['either','Either']].map(function(x){
+      return '<button class="'+(f===x[0]?'active':'')+(x[0]==='both'?' both':'')+'" onclick="App.setFilter(\''+x[0]+'\')">'+esc(x[1])+'</button>'; }).join('')+'</div>';
+  var lst = (tab==='mine' ? mine : theirs).filter(function(c){
+    if(f==='own') return !!c.assigned_to && ownerOf(c)===ownId;
+    if(f==='both') return isBoth(c);
+    if(f==='either') return !c.assigned_to && !isBoth(c);
+    return true;
+  }).sort(byDue);
   var hiddenCount = 0;
   if(!state.showHidden){ lst = lst.filter(function(c){ if(roomHidden(c.room)){ hiddenCount++; return false; } return true; }); }
   var gb = state.settings.groupBy;
@@ -845,7 +887,7 @@ function screenHome(){
   }
   var groups = gb==='room' ? groupByRoom(lst) : groupByDate(lst);
   groups.forEach(function(g){
-    h += '<div class="group-h'+(g[0]==='Overdue'?' overdue':'')+'"><span>'+esc(g[0])+'</span><span>'+g[1].length+'</span></div>';
+    h += '<div class="group-h'+(g[0]==='Overdue'?' overdue':'')+(g[0]==='Top priority today'?' prio':'')+'"><span>'+esc(g[0])+'</span><span>'+g[1].length+'</span></div>';
     g[1].forEach(function(c){ h += choreRow(c, tab); });
   });
   if(hiddenCount) h += '<div class="hidden-note">'+hiddenCount+' in hidden rooms · <button class="linkish" onclick="App.toggleHidden()">Show</button></div>';
@@ -870,10 +912,25 @@ function doneList(){
     var p = person(x.done_by), c = chore(x.chore_id);
     var title = (c && c.title) || x.chore_title || 'Chore';
     h += '<div class="done-row">'+whoChip(p)+
-      '<div class="t'+(x.skipped?' skipped':'')+'">'+esc(title)+'<span>'+(x.skipped?'Skipped':'Done')+' by '+esc(p?p.name:'?')+' · '+timeOf(x.done_at)+'</span></div>'+
+      '<div class="t'+(x.skipped?' skipped':'')+'">'+esc(title)+'<span>'+(x.skipped?'Skipped':'Done')+' by '+esc(p?p.name:'?')+(x.together&&!x.skipped?' · both of you':'')+' · '+timeOf(x.done_at)+'</span></div>'+
       '<button class="small-btn" onclick="App.undo(\''+x.id+'\')">Undo</button></div>';
   });
   return h + '</div>';
+}
+
+/* ---------- everything waiting for me ---------- */
+function screenWaiting(){
+  var w = waitingForMe();
+  var h = '<button class="top-back" onclick="App.go(\'home\')">'+icon('back',18)+'Chores</button>'+
+    '<h1 class="page-title">Waiting for you</h1>'+
+    '<div class="hint" style="margin:-8px 0 12px">Everything that is yours (or for either or both of you) and due today or overdue, with today\'s priorities first.</div>';
+  if(!w.length) return h + '<div class="empty">'+brainSVG(56)+'<br>Nothing waiting. Nice work.</div>';
+  var groups = groupByDate(w);
+  groups.forEach(function(g){
+    h += '<div class="group-h'+(g[0]==='Overdue'?' overdue':'')+(g[0]==='Top priority today'?' prio':'')+'"><span>'+esc(g[0])+'</span><span>'+g[1].length+'</span></div>';
+    g[1].forEach(function(c){ h += choreRow(c, 'mine'); });
+  });
+  return h;
 }
 
 /* ---------- chore detail ---------- */
@@ -894,10 +951,13 @@ function screenDetail(){
     h += '<div class="btn-row">'+(c.repeat_type!=='none'?'<button class="btn btn-secondary btn-slim" onclick="App.skip(\''+c.id+'\')">'+icon('skip',16)+'Skip this time</button>':'')+
       '<button class="btn btn-secondary btn-slim" onclick="App.snooze(\''+c.id+'\')">'+icon('snooze',16)+'Snooze to tomorrow</button></div>';
   }
+  if(!c.finished) h += '<div class="btn-row"><button class="btn btn-prio btn-slim'+(isPriority(c)?' on':'')+'" onclick="App.togglePriority(\''+c.id+'\')">'+balloonSVG(15)+(isPriority(c)?'Today\'s priority · tap to remove':'Make it today\'s priority')+'</button></div>';
   h += '<label class="lbl" style="margin-top:6px">Whose job?</label><div class="seg">'+
-    '<button class="'+(c.assigned_to===me.id?'active':'')+'" onclick="App.assign(\''+c.id+'\',\''+me.id+'\')">'+(c.assigned_to===me.id?esc(me.name):'Make it mine')+'</button>'+
-    (p.id?'<button class="'+(c.assigned_to===p.id?'active':'')+'" onclick="App.assign(\''+c.id+'\',\''+p.id+'\')">'+(c.assigned_to===p.id?esc(p.name):'Give it to '+esc(p.name))+'</button>':'')+
-    '<button class="'+(!c.assigned_to?'active':'')+'" onclick="App.assign(\''+c.id+'\',\'\')">'+(!c.assigned_to?'Either':'Either of us')+'</button></div>';
+    '<button class="'+(c.assigned_to===me.id?'active':'')+'" onclick="App.assign(\''+c.id+'\',\''+me.id+'\')">'+esc(me.name)+'</button>'+
+    (p.id?'<button class="'+(c.assigned_to===p.id?'active':'')+'" onclick="App.assign(\''+c.id+'\',\''+p.id+'\')">'+esc(p.name)+'</button>':'')+
+    '<button class="'+(!c.assigned_to&&!c.together?'active':'')+'" onclick="App.assign(\''+c.id+'\',\'\')">Either</button>'+
+    '<button class="'+(isBoth(c)?'active':'')+'" onclick="App.assign(\''+c.id+'\',\'__both\')">Both</button></div>'+
+    '<div class="hint">'+(isBoth(c)?'Both of you do this together. It counts for both of you in Fairness.':!c.assigned_to?'Either of you can do it.':'Tap a name to move it to their list.')+'</div>';
 
   /* checklist */
   var items = list(c), nd = items.filter(function(i){ return i.done; }).length;
@@ -965,8 +1025,9 @@ function fairStats(from){
     var r = res[x.done_by]; if(!r) return;
     if(x.skipped){ r.skipped++; return; }
     var c = chore(x.chore_id), title = (c&&c.title)||x.chore_title||'Chore';
-    r.done++; r.points += (x.effort||1);
-    r.titles[title] = (r.titles[title]||0)+1;
+    /* a "Both of us" chore counts for both people */
+    var who = x.together ? state.people.map(function(p){ return res[p.id]; }) : [r];
+    who.forEach(function(w){ w.done++; w.points += (x.effort||1); w.titles[title] = (w.titles[title]||0)+1; });
   });
   return state.people.map(function(p){ return res[p.id]; });
 }
@@ -1118,6 +1179,8 @@ function screenEdit(){
   }
   h += '<label class="lbl">How big a job?</label><div class="seg">'+
     [1,2,3].map(function(n){ return '<button class="'+(e.effort===n?'active':'')+'" onclick="App.f(\'effort\','+n+',1)">'+['','Small','Medium','Big'][n]+'</button>'; }).join('')+'</div>';
+  h += '<div class="set-row" style="margin-bottom:10px"><span style="display:flex;align-items:center;gap:8px">'+balloonSVG(16)+'<span>Top priority today<br><span style="font-size:12px;color:var(--neutral-dim)">Red balloon on both phones until tonight</span></span></span>'+
+    '<button class="switch'+(e.priority_on===today()?' on':'')+'" aria-label="Switch top priority today" onclick="App.f(\'priority_on\',\''+(e.priority_on===today()?'':today())+'\',1)"></button></div>';
   h += '<label class="lbl">Checklist</label>';
   list(e).forEach(function(it, i){
     h += '<div class="ed-item"><input type="text" value="'+esc(it.text)+'" aria-label="Checklist item '+(i+1)+'" oninput="App.itemText('+i+',this.value)">'+
@@ -1135,7 +1198,9 @@ function whoseJobSeg(e, fnPrefix, noEither){
   return '<label class="lbl">Whose job?</label><div class="seg">'+
     '<button class="'+(e.assigned_to===me.id?'active':'')+'" onclick="'+fnPrefix+'\''+me.id+'\',1)">'+esc(me.name)+'</button>'+
     '<button class="'+(p.id && e.assigned_to===p.id?'active':'')+'" onclick="'+fnPrefix+'\''+(p.id||'')+'\',1)">'+esc(p.name)+'</button>'+
-    (noEither?'':'<button class="'+(!e.assigned_to?'active':'')+'" onclick="'+fnPrefix+'\'\',1)">Either</button>')+'</div>';
+    (noEither?'':'<button class="'+(!e.assigned_to&&!e.together?'active':'')+'" onclick="'+fnPrefix+'\'\',1)">Either</button>'+
+      '<button class="'+(!e.assigned_to&&e.together?'active':'')+'" onclick="'+fnPrefix+'\'__both\',1)">Both</button>')+'</div>'+
+    (!noEither && !e.assigned_to && e.together ? '<div class="hint">Both of you do this together. It shows in yellow and counts for both of you.</div>' : '');
 }
 function roomSelect(id, val, onchange){
   var rooms = allRooms(); if(rooms.indexOf(val)<0) rooms.push(val);
@@ -1193,6 +1258,7 @@ function render(){
   h += header() + '<div class="main">';
   if(s==='home') h += screenHome();
   else if(s==='detail') h += screenDetail();
+  else if(s==='waiting') h += screenWaiting();
   else if(s==='fair') h += screenFair();
   else if(s==='settings') h += screenSettings();
   else if(s==='arrange') h += screenArrange();
@@ -1382,14 +1448,23 @@ window.App = {
   },
   assign: function(id, who){
     var c = chore(id); if(!c) return;
-    who = who || null;
-    if(c.assigned_to===who) return;
+    var both = who==='__both';
+    who = (who && !both) ? who : null;
+    if(c.assigned_to===who && !!c.together===both) return;
     if(!who && c.rotate){ alert('This chore takes turns, so it needs a person. Switch off Take turns in Edit first.'); return; }
-    var copy = JSON.parse(JSON.stringify(c)); copy.assigned_to = who; copy.updated_at = nowISO();
+    var copy = JSON.parse(JSON.stringify(c)); copy.assigned_to = who; copy.together = both; copy.updated_at = nowISO();
     var p = person(who);
     change('save', {chore:copy, notify: who && who!==state.me.id ? 'assigned' : null});
-    toast(c.title+' – '+(p ? (p.id===state.me.id ? 'now yours' : 'now '+p.name+'\'s') : 'now Either of you'));
+    toast(c.title+' – '+(p ? (p.id===state.me.id ? 'now yours' : 'now '+p.name+'\'s') : both ? 'now for both of you' : 'now Either of you'));
   },
+  togglePriority: function(id){
+    var c = chore(id); if(!c) return;
+    var on = !isPriority(c);
+    var copy = JSON.parse(JSON.stringify(c)); copy.priority_on = on ? today() : null; copy.updated_at = nowISO();
+    change('save', {chore:copy});
+    toast(on ? c.title+' – today\'s top priority' : c.title+' – priority removed');
+  },
+  setFilter: async function(f){ state.settings.listFilter = f; await saveSettings(); render(); },
   openChore: function(id){ state.detailId = id; state.commentDraft = ''; state.itemDraft = ''; state.screen = 'detail'; render(); window.scrollTo(0,0); },
   closeSheet: closeSheet,
   addMenu: function(){
@@ -1401,7 +1476,7 @@ window.App = {
   newChore: function(){
     closeSheet();
     state.edit = {id:uuid(), title:'', notes:'', room:'Kitchen', assigned_to:state.tab==='partner'?(partner().id||null):state.me.id,
-      repeat_type:'weekly', repeat_every:1, repeat_from:'schedule', next_due:today(), due_time:'', effort:1, finished:false, archived:false, checklist:[], rotate:false};
+      repeat_type:'weekly', repeat_every:1, repeat_from:'schedule', next_due:today(), due_time:'', effort:1, finished:false, archived:false, checklist:[], rotate:false, together:false, priority_on:null};
     state.editError = ''; state.screen = 'edit'; render(); window.scrollTo(0,0);
     setTimeout(function(){ var t = document.getElementById('f_title'); if(t) t.focus(); }, 50);
   },
@@ -1414,14 +1489,15 @@ window.App = {
   f: function(k, v, rerender){
     if(k==='effort') v = +v;
     if(k==='repeat_every') v = Math.max(1, Math.min(365, parseInt(v,10)||1));
-    if(k==='assigned_to') v = v || null;
+    if(k==='assigned_to'){ state.edit.together = (v==='__both'); v = (v && v!=='__both') ? v : null; }
+    if(k==='priority_on') v = v || null;
     state.edit[k] = v;
     if(k==='repeat_type' && v==='none') state.edit.rotate = false;
     if(rerender){ var y = window.scrollY; render(); window.scrollTo(0,y); }
   },
   toggleRotate: function(){
     var e = state.edit; e.rotate = !e.rotate;
-    if(e.rotate && !e.assigned_to) e.assigned_to = state.me.id;
+    if(e.rotate && !e.assigned_to){ e.assigned_to = state.me.id; e.together = false; }
     var y = window.scrollY; render(); window.scrollTo(0,y);
   },
   itemText: function(i, v){ state.edit.checklist[i].text = v; },
@@ -1459,7 +1535,8 @@ window.App = {
     if(!e.title){ state.editError = 'Give the chore a name.'; render(); return; }
     e.checklist = list(e).map(function(it){ return Object.assign({}, it, {text:(it.text||'').trim()}); }).filter(function(it){ return it.text; });
     if(e.repeat_type!=='none' && !e.next_due) e.next_due = today();
-    if(e.rotate && !e.assigned_to) e.assigned_to = state.me.id;
+    if(e.rotate && !e.assigned_to){ e.assigned_to = state.me.id; }
+    e.together = !e.assigned_to && !!e.together;
     var existing = chore(e.id);
     if(existing && existing.finished && e.next_due) e.finished = false; /* editing a finished one-off brings it back */
     e.updated_at = nowISO();
@@ -1539,7 +1616,10 @@ window.App = {
     state.paste.text = v;
     if(parseNote(v).length !== before){ state.paste.skip = {}; var el = document.getElementById('pasteText'), pos = el ? el.selectionStart : 0; render(); var n = document.getElementById('pasteText'); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(e){} } }
   },
-  pasteSet: function(k, v){ state.paste[k] = (k==='assigned_to' ? (v||null) : v); var y = window.scrollY; render(); window.scrollTo(0,y); },
+  pasteSet: function(k, v){
+    if(k==='assigned_to'){ state.paste.together = (v==='__both'); v = (v && v!=='__both') ? v : null; }
+    state.paste[k] = v; var y = window.scrollY; render(); window.scrollTo(0,y);
+  },
   pasteSetQuiet: function(k, v){ state.paste[k] = v; },
   pasteFirstLine: function(){ state.paste.firstIsTitle = !state.paste.firstIsTitle; state.paste.title = null; state.paste.skip = {}; var y = window.scrollY; render(); window.scrollTo(0,y); },
   pasteSkip: function(i){ state.paste.skip[i] = !state.paste.skip[i]; var y = window.scrollY; render(); window.scrollTo(0,y); },
@@ -1551,7 +1631,7 @@ window.App = {
   cancelPaste: function(){ state.paste = null; state.screen = 'home'; render(); },
   pasteCreate: function(){
     var d = state.paste, lines = parseNote(d.text), skip = d.skip||{};
-    var base = {notes:'', room:d.room||'Other', assigned_to:d.assigned_to||null, repeat_type:d.repeat_type, repeat_every:1, repeat_from:'schedule',
+    var base = {notes:'', room:d.room||'Other', assigned_to:d.assigned_to||null, together:!d.assigned_to && !!d.together, priority_on:null, repeat_type:d.repeat_type, repeat_every:1, repeat_from:'schedule',
       next_due:d.next_due||null, due_time:null, effort:1, finished:false, archived:false, rotate:false};
     if(d.repeat_type!=='none' && !base.next_due) base.next_due = today();
     var made = 0, firstId = null, notifyAny = base.assigned_to && base.assigned_to!==state.me.id;
