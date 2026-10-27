@@ -100,6 +100,11 @@ input[type=date],input[type=time]{min-width:0;max-width:100%;display:block;}
 .group-h:first-child{margin-top:4px;}
 .chore{display:flex;align-items:center;gap:12px;background:var(--secondary-light);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;}
 .chore.late{border-left:4px solid var(--danger);}
+/* each person's chores carry their colour: a stripe on the left and a light tint */
+.chore.owned{border-left:5px solid var(--own);background:linear-gradient(var(--ownbg),var(--ownbg)),var(--secondary-light);}
+.chore.owned.late{border-left-color:var(--danger);}
+.who.name{width:auto;padding:0 9px;border-radius:999px;font-size:11px;letter-spacing:.02em;height:24px;}
+.detail-sub .who.name{height:22px;}
 .chore.paused{opacity:.6;}
 .tick{flex:none;width:32px;height:32px;border-radius:50%;border:2.5px solid var(--neutral-dim);background:transparent;color:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
 .tick:active,.tick.on{background:var(--success);border-color:var(--success);color:#fff;}
@@ -241,7 +246,7 @@ pre.share-text{white-space:pre-wrap;font:13px/1.45 Inter,sans-serif;background:v
    ===================================================================== */
 var SUPABASE_URL = 'https://hlmrxflsgkienvcvaxhe.supabase.co';
 var SUPABASE_ANON_KEY = 'sb_publishable_1-KKc8z1S5azfq0Zkr3lnA_ObB0lMkS';
-var APP_VERSION = 'v3 - 27 Oct 2026';
+var APP_VERSION = 'v3.1 - 27 Oct 2026';
 
 var CONFIGURED = /^https:\/\//.test(SUPABASE_URL) && SUPABASE_ANON_KEY.indexOf('PASTE') !== 0;
 var FUNCTION_URL = SUPABASE_URL.replace(/\/$/, '') + '/functions/v1/brain-dump';
@@ -487,6 +492,10 @@ function roomHidden(r){ return (state.settings.hiddenRooms||[]).indexOf(r) >= 0;
 function commentsFor(id){ return state.comments.filter(function(m){ return m.chore_id===id; }).sort(function(a,b){ return tsMs(a.created_at)-tsMs(b.created_at); }); }
 function mediaFor(id){ return state.attachments.filter(function(a){ return a.chore_id===id; }); }
 function list(c){ return Array.isArray(c.checklist) ? c.checklist : []; }
+function hexRgba(hex, a){ var m = /^#?([0-9a-f]{6})$/i.exec(hex||''); if(!m) return 'rgba(109,91,208,'+a+')'; var n = parseInt(m[1],16); return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')'; }
+/* name label in the person's colour, e.g. "Jen" */
+function nameTag(p){ return p ? '<span class="who name" style="background:'+esc(p.colour)+'">'+esc(p.name)+'</span>' : ''; }
+function ownerStyle(p){ return p ? ' style="--own:'+esc(p.colour)+';--ownbg:'+hexRgba(p.colour, document.documentElement.getAttribute('data-theme')==='light'?0.09:0.14)+'"' : ''; }
 function whoChip(p, small){ return p ? '<span class="who'+(small?' sm':'')+'" style="background:'+esc(p.colour)+'">'+esc(p.name.charAt(0))+'</span>' : ''; }
 
 /* ---------- icons ---------- */
@@ -802,7 +811,8 @@ function choreRow(c, tab){
   var who = '';
   if(isBoth(c)) who = '<span class="who both">Both</span>';
   else if(!c.assigned_to) who = '<span class="who either">Either</span>';
-  else if(isCovering(c)) who = whoChip(person(c.assigned_to));
+  else who = nameTag(person(c.assigned_to));
+  var owner = c.assigned_to ? person(c.assigned_to) : null;
   var items = list(c), done = items.filter(function(i){ return i.done; }).length;
   var nC = commentsFor(c.id).length, nM = mediaFor(c.id).length;
   var lastBy = c.last_done_by && person(c.last_done_by);
@@ -813,7 +823,7 @@ function choreRow(c, tab){
   if(c.last_done_at) sub += '<span>Last done '+esc(agoLabel(c.last_done_at))+(lastBy?' · '+esc(lastBy.name):'')+'</span>';
   if(isCovering(c)) sub += '<span>Covering for '+esc(person(c.assigned_to).name)+'</span>';
   var prio = isPriority(c);
-  return '<div class="chore'+(late?' late':'')+(paused?' paused':'')+(prio?' prio':'')+'" data-chore="'+esc(c.title)+'">'+
+  return '<div class="chore'+(late?' late':'')+(paused?' paused':'')+(prio?' prio':'')+(owner?' owned':'')+'" data-chore="'+esc(c.title)+'"'+ownerStyle(owner)+'>'+
     '<button class="tick" aria-label="Mark '+esc(c.title)+' done" onclick="App.tick(\''+c.id+'\',this)">'+icon('check',18)+'</button>'+
     '<div class="chore-main" onclick="App.openChore(\''+c.id+'\')">'+
       '<div class="chore-title'+(isBoth(c)?' both':'')+'">'+esc(c.title)+'</div><div class="chore-sub">'+sub+'</div>'+
@@ -856,7 +866,7 @@ function screenHome(){
       '<div class="att-sum">'+waiting.length+' chore'+(waiting.length===1?'':'s')+' waiting for you'+(od?' · '+od+' overdue':'')+'</div>';
     waiting.slice(0,3).forEach(function(c){
       h += '<div class="att-row"><button class="tick" aria-label="Mark '+esc(c.title)+' done" onclick="App.tick(\''+c.id+'\',this)">'+icon('check',18)+'</button>'+
-        '<div class="t'+(isBoth(c)?' both':'')+'" onclick="App.openChore(\''+c.id+'\')">'+esc(c.title)+'<span>'+esc(isPriority(c)?'Top priority today · '+dueLabel(c):dueLabel(c))+'</span></div>'+(isPriority(c)?balloon():'')+'</div>';
+        '<div class="t'+(isBoth(c)?' both':'')+'" onclick="App.openChore(\''+c.id+'\')">'+esc(c.title)+'<span>'+esc(isPriority(c)?'Top priority today · '+dueLabel(c):dueLabel(c))+'</span></div>'+(isPriority(c)?balloon():'')+(c.assigned_to?nameTag(person(c.assigned_to)):isBoth(c)?'<span class="who both">Both</span>':'')+'</div>';
     });
     if(waiting.length>3) h += '<button class="linkish" onclick="App.go(\'waiting\')">See all '+waiting.length+' waiting for you</button>';
     h += '</div>';
@@ -940,7 +950,7 @@ function screenDetail(){
   var me = state.me, p = partner(), late = isLate(c), owner = c.assigned_to ? person(c.assigned_to) : null;
   var h = '<button class="top-back" onclick="App.go(\'home\')">'+icon('back',18)+'Chores</button>';
   h += '<div class="detail-title">'+esc(c.title)+'</div>';
-  h += '<div class="detail-sub"><span class="'+(late?'late':'')+'">'+esc(c.finished?'Done':dueLabel(c))+'</span><span>'+esc(c.room)+'</span><span>↻ '+esc(repeatLabel(c))+'</span>'+effortDots(c.effort)+'</div>';
+  h += '<div class="detail-sub">'+(owner?nameTag(owner):isBoth(c)?'<span class="who both">Both</span>':'<span class="who either">Either</span>')+'<span class="'+(late?'late':'')+'">'+esc(c.finished?'Done':dueLabel(c))+'</span><span>'+esc(c.room)+'</span><span>↻ '+esc(repeatLabel(c))+'</span>'+effortDots(c.effort)+'</div>';
   if(c.notes) h += '<div class="notes">'+esc(c.notes)+'</div>';
   var lastBy = c.last_done_by && person(c.last_done_by);
   h += '<div class="hint" style="margin:0 0 12px">'+(c.last_done_at ? 'Last done '+esc(agoLabel(c.last_done_at))+(lastBy?' by '+esc(lastBy.name):'')+' ('+esc(whenLabel(c.last_done_at))+')' : 'Not done yet')+

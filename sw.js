@@ -1,4 +1,4 @@
-var CACHE = 'braindump-v3';
+var CACHE = 'braindump-v3-1';
 var ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-180.png'];
 /* the database library comes from a CDN; keep a copy so the app still opens with no signal */
 var LIBS = ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js'];
